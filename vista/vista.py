@@ -12,13 +12,24 @@ BTN_COLOR = "#4CAF50"
 BTN_TEXT_COLOR = "white"
 
 
-class App(tk.Tk):
-    def __init__(self):
+class Vista(tk.Tk):
+    def __init__(self, ):
         super().__init__()
         self.title("SIMULACIÓN TP4 - GRUPO 6")
         self.geometry("1280x720")
         self.configure(bg=BG_COLOR)
         self._crear_widgets()
+     
+
+    def callback_iniciar_simulacion(self, callback):
+        self._callback_iniciar_simulacion = callback
+
+
+    def _accion_iniciar_simulacion(self):
+        if self._callback_iniciar_simulacion:
+            self._callback_iniciar_simulacion()
+
+
 
     def _titulo_ventana(self):
         frame_titulo = tk.Frame(self, bg=BG_COLOR)
@@ -42,12 +53,12 @@ class App(tk.Tk):
             fg=FG_LABEL,
         ).grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
-        self.tiempo_entry = tk.Entry(
+        self.tiempo_duracion = tk.Entry(
             self.frame_sim,
             font=FONT_ENTRY,
             width=30,
         )
-        self.tiempo_entry.grid(row=0, column=1, padx=10, pady=5)
+        self.tiempo_duracion.grid(row=0, column=1, padx=10, pady=5)
 
         tk.Label(
             self.frame_sim,
@@ -103,15 +114,12 @@ class App(tk.Tk):
             font=FONT_LABEL,
             bg=BTN_COLOR,
             fg=BTN_TEXT_COLOR,
-            command=self._accion_iniciar_simulacion,
+            command=self._accion_iniciar_simulacion ,
             padx=20,
             pady=10
         )
         btn_iniciar_sim.pack()
 
-    def _accion_iniciar_simulacion(self):
-        print("INICIAR SIMULACIÓN")
-        
 
     def _crear_widgets(self):
         self._titulo_ventana()
@@ -135,6 +143,3 @@ class App(tk.Tk):
         self._iniciar_simulacion()
 
 
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
