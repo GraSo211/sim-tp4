@@ -1,7 +1,7 @@
-from servidor.mecanico import Mecanico
-from servidor.asistente import Asistente
-from cliente.cliente import Cliente
-from vector_estado import Vector_Estado
+from modelo.servidor.mecanico import Mecanico
+from modelo.servidor.asistente import Asistente
+from modelo.cliente.cliente import Cliente
+from modelo.vector_estado import Vector_Estado
 
 CANT_MAXIMA_ITERACIONES = 100000
 BICIS_REPARADAS = 3
@@ -12,11 +12,12 @@ class Simulacion:
         self.CANT_ITERACIONES = CANT_ITERACIONES;
         self.reloj_inicial = 0
         self.cont_iteraciones = 0
-        self.mecanico = Mecanico(),
+        self.mecanico = Mecanico()
         self.asistente = Asistente()
         self.clientes: list[Cliente] = []
         self.vector_estado_anterior: Vector_Estado = None
 
     def simular_taller_bicicletas(self):
         vector_estado_actual = Vector_Estado()
+        print(self.mecanico.estado)
 

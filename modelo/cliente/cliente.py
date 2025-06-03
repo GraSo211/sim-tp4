@@ -1,14 +1,14 @@
 import random
-from estado_cliente import Estado_Cliente
-from motivo_cliente import Motivo_Cliente
+from modelo.cliente.estado_cliente import Estado_Cliente
+from modelo.cliente.motivo_cliente import Motivo_Cliente
 class Cliente:
-    def __init__(self, id, estado:Estado_Cliente,  hora_llegada, ):
-        self.id = id
+    def __init__(self, id:int, estado:Estado_Cliente,  hora_llegada:float, ):
+        self.id:int = id
         self.estado:Estado_Cliente = estado
         self.motivo_llegada: Motivo_Cliente = None
-        self.tiempo_entre_llegada = None
-        self.hora_llegada = hora_llegada
-        self.hora_fin_atencion = None
+        self.tiempo_entre_llegada:float = None
+        self.hora_llegada:float = hora_llegada
+        self.hora_fin_atencion:float = None
 
 
     def _llegada_cliente(self):

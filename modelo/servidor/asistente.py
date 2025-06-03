@@ -1,10 +1,11 @@
 import random
-from estado import Estado
-from cliente.motivo_cliente import Motivo_Cliente
+from modelo.servidor.estado import Estado
+from modelo.cliente.motivo_cliente import Motivo_Cliente
 
 class Asistente:
     def __init__(self):
         self.estado:Estado = Estado.LIBRE
+        self.cola:int = 0
 
     def _generar_tiempo_atencion(motivo_cliente: Motivo_Cliente):
         # EL TIEMPO DE ATENCION DE LOS CLIENTES ES:

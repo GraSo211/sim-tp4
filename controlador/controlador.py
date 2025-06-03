@@ -1,6 +1,8 @@
+from modelo.simulacion import Simulacion
 class Controlador:
     def __init__(self, vista):
         self.vista = vista
+
         self.vista.callback_iniciar_simulacion(self.iniciar_simulacion)
 
     def iniciar_simulacion(self):
@@ -33,6 +35,11 @@ class Controlador:
         if not status:
             self.vista.tiempo_error["text"] = error
             return
+            
+        self.modelo = Simulacion(tiempo_duracion, hora_observar, cant_iteraciones)
+
+
+        self.modelo.simular_taller_bicicletas()
 
     def validar_tiempo(self):
         status = False
@@ -56,7 +63,7 @@ class Controlador:
         res = None
         try:
             hora_observar = int(self.vista.hora_observar.get())
-            if hora_observar < 0 or hora_observar > tiempo_x:
+            if hora_observar < 0 or hora_observar >= tiempo_x:
                 res = "La hora a partir de la cual quiere observar debe ser un número positivo y menor al tiempo X."
                 return res, status
             else:

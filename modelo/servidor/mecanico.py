@@ -1,9 +1,9 @@
-from estado import Estado
+from modelo.servidor.estado import Estado
 import random;
 class Mecanico:
     def __init__(self):
-        self.estado:Estado = Estado.Libre
-        self.tiempo_limpieza = 5;
+        self.estado:Estado = Estado.LIBRE
+        self.tiempo_limpieza:float = 5;
 
 
 
