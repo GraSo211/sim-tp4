@@ -1,9 +1,11 @@
-from modelo.servidor.estado import Estado
+from modelo.servidor.estado_mecanico import Estado
 import random;
 class Mecanico:
-    def __init__(self):
+    def __init__(self, cola_bicis_reparadas:int):
         self.estado:Estado = Estado.LIBRE
         self.tiempo_limpieza:float = 5;
+        self.cola_reparacion = 0;
+        self.cola_bicis_reparadas = cola_bicis_reparadas;
 
 
 
