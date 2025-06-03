@@ -7,9 +7,10 @@ class Simulacion:
         self.TIEMPO_SIMULACION = TIEMPO_SIMULACION;
         self.HORA_OBSERVAR = HORA_OBSERVAR;
         self.CANT_ITERACIONES = CANT_ITERACIONES;
+        self.reloj_inicial = 0
+        
         self.mecanico = mecanico,
         self.asistente = asistente,
 
 
 
-    
