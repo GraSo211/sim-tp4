@@ -2,7 +2,7 @@ import random
 from estado_cliente import Estado_Cliente
 from motivo_cliente import Motivo_Cliente
 class Cliente:
-    def __init__(self, id, estado:Estado_Cliente, , hora_llegada, ):
+    def __init__(self, id, estado:Estado_Cliente,  hora_llegada, ):
         self.id = id
         self.estado:Estado_Cliente = estado
         self.motivo_llegada: Motivo_Cliente = None

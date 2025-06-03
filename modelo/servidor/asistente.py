@@ -18,3 +18,6 @@ class Asistente:
             tiempo = 3;
 
         return tiempo
+    
+
+    
