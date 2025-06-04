@@ -22,6 +22,18 @@ class Simulacion:
         self.vector_estado_anterior: Vector_Estado = None
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
 
+
+
+    def determinar_evento_asociado(proximo_evento, cliente, tiempo_fin_reparacion, tiempo_fin_limpieza):
+        if proximo_evento == cliente.hora_llegada:
+            return Evento.LLEGADA_CLIENTE
+        elif proximo_evento == cliente.hora_fin_atencion:
+            return Evento.FIN_ATENCION_ASISTENTE
+        elif proximo_evento == tiempo_fin_reparacion:
+            return Evento.FIN_REPARACION
+        elif proximo_evento == tiempo_fin_limpieza:
+            return Evento.FIN_LIMPIEZA
+
     def simular_taller_bicicletas(self):
         # INICIA LA SIMULACION
         clientes_id = 1
@@ -33,20 +45,22 @@ class Simulacion:
         evento = Evento.INIT
         reloj = self.reloj_inicial
 
-        tiempo_entre_llegada_cliente = cliente1._llegada_cliente()
-        cliente1.hora_llegada = tiempo_entre_llegada_cliente
+        [cliente_hora_llegada, tiempo_entre_llegada_cliente] = cliente1.llegada_cliente(reloj)
+        cliente1.hora_llegada = cliente_hora_llegada
 
-        tiempo_atencion_asistente = self.asistente._generar_tiempo_atencion(cliente1.motivo_llegada)
-        hora_fin_atencion = tiempo_atencion_asistente + reloj
+
+        tiempo_atencion_asistente = self.asistente.generar_tiempo_atencion(
+            cliente1.motivo_llegada
+        )
+        cliente1.set_fin_atencion(reloj,tiempo_atencion_asistente)
+        hora_fin_atencion = cliente1.hora_fin_atencion
 
         estado_cliente = cliente1.estado
 
-        tiempo_reparacion = 0;
-        tiempo_fin_reparacion = reloj+tiempo_reparacion;
+        tiempo_reparacion = 0
+        tiempo_fin_reparacion = reloj + tiempo_reparacion
 
         tiempo_fin_limpieza = 0
-
-
 
         vector_estado_actual = Vector_Estado(
             evento,
@@ -64,9 +78,31 @@ class Simulacion:
             tiempo_fin_reparacion,
             self.mecanico.estado,
             self.mecanico.cola_reparacion,
-            tiempo_fin_limpieza
+            tiempo_fin_limpieza,
         )
 
-        self.array_vector_estado_mostrar.append(vector_estado_actual)
+        CONT_ITERACIONES = 0
+        while (
+            CONT_ITERACIONES <= CANT_MAXIMA_ITERACIONES
+            or reloj <= self.TIEMPO_SIMULACION
+        ):
+            # HACEMOS ALGO
+            proximo_evento = min(
+                [
+                    cliente1.hora_llegada,
+                    cliente1.hora_fin_atencion,
+                    tiempo_fin_reparacion,
+                    tiempo_fin_limpieza,
+                ]
+            )
+            reloj = proximo_evento
+            evento = self.determinar_evento_asociado(self.clientes[-1],tiempo_fin_reparacion,tiempo_fin_limpieza)
+
+            if reloj >= self.HORA_OBSERVAR and self.CANT_MAXIMA_ITERACIONES > 0:
+                self.array_vector_estado_mostrar.append(vector_estado_actual)
+                self.CANT_MAXIMA_ITERACIONES -= 1
+
+            # AL FINAL SUMAMOS 1 AL CONTADOR
+            CONT_ITERACIONES += 1
 
         return self.array_vector_estado_mostrar

@@ -8,7 +8,7 @@ class Asistente:
         self.cola:int = 0
 
 
-    def _generar_tiempo_atencion(self,motivo_cliente: Motivo_Cliente):
+    def generar_tiempo_atencion(self,motivo_cliente: Motivo_Cliente):
         # EL TIEMPO DE ATENCION DE LOS CLIENTES ES:
         # 3 MINUTOS SI ES PARA ENTREGAR O RETIRAR BICICLETAS
         # EN CASO DE COMPRAR ACCESORIOS LA ATENCION SERA UNA DISTRIBUCION UNIFORME

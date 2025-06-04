@@ -7,13 +7,12 @@ class Mecanico:
         self.cola_reparacion = 0;
         self.cola_bicis_reparadas = cola_bicis_reparadas;
 
+    def tiempo_reparar_bicicleta(self):
+        return random.uniform(18, 22)
 
+    def calcular_fin_limpieza(self, tiempo_actual: float):
+        return tiempo_actual + self.tiempo_limpieza
 
-    def _tiempo_reparar_bicicleta():
-        return random.uniform(18,22)
-
-
-
-    def _tiempo_fin_limpieza(self,tiempo):
-        return tiempo + self.tiempo_limpieza
-        
+    def atender_bicicleta(self, tiempo_actual: float):
+        self.estado = Estado.OCUPADO
+        return tiempo_actual + self.tiempo_reparar_bicicleta()
