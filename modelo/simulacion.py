@@ -73,7 +73,7 @@ class Simulacion:
             tiempo_reparacion=0.0,
             tiempo_fin_reparacion=0.0,
             estado_mecanico=self.mecanico.estado,
-            cola_mecanico=len(self.mecanico.cola_mecanico),
+            cola_mecanico=len(self.mecanico.cola_reparacion),
             tiempo_fin_limpieza=0.0,
         )
 
