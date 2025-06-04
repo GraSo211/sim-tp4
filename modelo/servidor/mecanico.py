@@ -6,7 +6,7 @@ class Mecanico:
     def __init__(self, cola_bicis_reparadas: int):
         self.estado: Estado = Estado.LIBRE.value
         self.tiempo_limpieza: float = 5.0
-        self.cola_reparacion = 0.0
+        self.cola_reparacion = 0
         self.cola_bicis_reparadas = cola_bicis_reparadas
         self.tiempo_reparacion = 0.0
         self.tiempo_fin_limpieza: float = 0.0
@@ -43,9 +43,7 @@ class Mecanico:
             self.cola_reparacion -= 1
             self.tiempo_reparacion = round(random.uniform(18, 22), 4)
             self.tiempo_fin_reparacion = round(reloj + self.tiempo_reparacion, 4)
-            
+
         # SI NO HAY BICIS EN LA COLA DE REPARACION, VUELVE A ESTAR LIBRE
         else:
             self.estado = Estado.LIBRE.value
-
- 

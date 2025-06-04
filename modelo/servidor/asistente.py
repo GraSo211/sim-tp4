@@ -1,32 +1,57 @@
 import random
 from modelo.servidor.estado_asistente import Estado
 from modelo.cliente.motivo_cliente import Motivo_Cliente
-
+from modelo.cliente.cliente import Cliente
+from typing import List
 class Asistente:
     def __init__(self):
         self.estado:Estado = Estado.LIBRE.value
-        self.cola:int = 0
+        self.cola_atencion: List[Cliente] = []
+        self.tiempo_atencion:float = 0.0
+        self.tiempo_fin_atencion:float = 0.0
 
 
-    def generar_tiempo_atencion(self,motivo_cliente: Motivo_Cliente):
-        # EL TIEMPO DE ATENCION DE LOS CLIENTES ES:
-        # 3 MINUTOS SI ES PARA ENTREGAR O RETIRAR BICICLETAS
-        # EN CASO DE COMPRAR ACCESORIOS LA ATENCION SERA UNA DISTRIBUCION UNIFORME
-        # ENTRE 6 Y 10 MINUTOS
-        if(motivo_cliente == Motivo_Cliente.CA.value ):
-            tiempo = random.uniform(6,10);
+    # EL ASISTENTE TIENE 2 OPCIONES:
+    # ESTAR LIBRE
+    # ESTAR OCUPADO ATENDIENDO A UN CLIENTE
 
-        elif(motivo_cliente == Motivo_Cliente.EBR.value or motivo_cliente == Motivo_Cliente.RBR.value ):
-            tiempo = 3;
+    def evento_atencion(self, cliente: Cliente, reloj: float):
+        # AL LLEGAR UN CLIENTE, SI EL ASISTENTE ESTA LIBRE, SE OCUPA ATENDIENDO
+        
+        if self.estado == Estado.LIBRE.value:
+            self.estado = Estado.OCUPADO.value
+            # EL TIEMPO DE ATENCION DE LOS CLIENTES ES:
+            # 3 MINUTOS SI ES PARA ENTREGAR O RETIRAR BICICLETAS
+            # EN CASO DE COMPRAR ACCESORIOS LA ATENCION SERA UNA DISTRIBUCION UNIFORME
+            # ENTRE 6 Y 10 MINUTOS
+            if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
+                self.tiempo_atencion = round(random.uniform(6,10),4);
+                self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
 
-        return round(tiempo,4)
+            elif(cliente.motivo_llegada == Motivo_Cliente.EBR.value or cliente.motivo_llegada == Motivo_Cliente.RBR.value ):
+                self.tiempo_atencion = round(3,4);
+                self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
+
+        # SI ESTA OCUPADO, AUMENTA LA COLA DE ESPERA
+        else:
+            self.cola_atencion.append(cliente)
+
+
     
 
-    def calcular_fin_atencion(self, tiempo_inicio: float, duracion: float) -> float:
-        return round(tiempo_inicio + duracion,4)
+    def evento_fin_atencion(self, reloj:float ) -> float:
+        # AL FINALIZAR LA ATENCION, SI HAY CLIENTES EN LA COLA, SE ATIENDE AL SIGUIENTE
+        if(len(self.cola_atencion) > 0):
+            cliente = self.cola_atencion.pop(0)
+            if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
+                self.tiempo_atencion = round(random.uniform(6,10),4);
+            elif(cliente.motivo_llegada == Motivo_Cliente.EBR.value or cliente.motivo_llegada == Motivo_Cliente.RBR.value ):
+                self.tiempo_atencion = round(3,4)
+            
+            self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
+
+        # SI NO HAY CLIENTES EN LA COLA, VUELVE A ESTAR LIBRE
+        else:
+            self.estado = Estado.LIBRE.value
     
 
-    def empezar_a_trabajar(self):
-        self.estado = Estado.OCUPADO.value
-        if self.cola > 0:
-            self.cola -= 1
