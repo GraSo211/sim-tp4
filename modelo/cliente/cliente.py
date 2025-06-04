@@ -20,12 +20,12 @@ class Cliente:
     def _generar_motivo_llegada(self):
         rnd = random.random()
         if(rnd<0.45):
-            self.motivo_llegada = Motivo_Cliente.CA
+            self.motivo_llegada = Motivo_Cliente.CA.value
 
         elif(rnd < 0.7):
-            self.motivo_llegada = Motivo_Cliente.EBR
+            self.motivo_llegada = Motivo_Cliente.EBR.value
         else:
-            self.motivo_llegada = Motivo_Cliente.RBR
+            self.motivo_llegada = Motivo_Cliente.RBR.value
 
 
     def evento_llegada_cliente(self, reloj: float):
