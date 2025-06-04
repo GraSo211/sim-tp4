@@ -3,6 +3,7 @@ from modelo.servidor.estado_asistente import Estado
 from modelo.cliente.motivo_cliente import Motivo_Cliente
 from modelo.cliente.cliente import Cliente
 from typing import List
+from modelo.cliente.estado_cliente import Estado_Cliente
 class Asistente:
     def __init__(self):
         self.estado:Estado = Estado.LIBRE.value
@@ -24,6 +25,7 @@ class Asistente:
             # 3 MINUTOS SI ES PARA ENTREGAR O RETIRAR BICICLETAS
             # EN CASO DE COMPRAR ACCESORIOS LA ATENCION SERA UNA DISTRIBUCION UNIFORME
             # ENTRE 6 Y 10 MINUTOS
+            cliente.estado = Estado_Cliente.SA.value
             if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
                 self.tiempo_atencion = round(random.uniform(6,10),4);
                 self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
@@ -34,6 +36,7 @@ class Asistente:
 
         # SI ESTA OCUPADO, AUMENTA LA COLA DE ESPERA
         else:
+            cliente.estado = Estado_Cliente.EA.value
             self.cola_atencion.append(cliente)
 
 
@@ -43,6 +46,7 @@ class Asistente:
         # AL FINALIZAR LA ATENCION, SI HAY CLIENTES EN LA COLA, SE ATIENDE AL SIGUIENTE
         if(len(self.cola_atencion) > 0):
             cliente = self.cola_atencion.pop(0)
+            cliente.estado = Estado_Cliente.SA.value
             if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
                 self.tiempo_atencion = round(random.uniform(6,10),4);
             elif(cliente.motivo_llegada == Motivo_Cliente.EBR.value or cliente.motivo_llegada == Motivo_Cliente.RBR.value ):

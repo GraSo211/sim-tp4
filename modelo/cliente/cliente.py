@@ -6,22 +6,16 @@ class Cliente:
         self.id:int = id
         self.estado:Estado_Cliente = estado
         self.motivo_llegada: Motivo_Cliente = None
-        self.hora_llegada:float = None
-        self.hora_fin_atencion:float = None
+        self.tiempo_entre_llegada:float = 0.0
+        self.tiempo_llegada:float = 0.0
+
+    # EL UNICO EVENTO DEL CLIENTE ES SU LLEGADA AL LOCAL
+    # SU LLEGADA PUEDE SER POR 3 MOTIVOS:
+    # - COMPRAR ACCESORIOS
+    # - ENTREGAR BICICLETA PARA REPARACION
+    # - RETIRAR BICICLETA REPARADA
 
 
-    def llegada_cliente(self, tiempo_actual):
-        tiempo_entre_llegada = random.uniform(13, 17)
-        self.hora_llegada = tiempo_actual + tiempo_entre_llegada
-        self._generar_motivo_llegada()
-        return tiempo_entre_llegada, self.hora_llegada
-    
-
-
-    def set_fin_atencion(self, tiempo_inicio, duracion):
-        self.hora_fin_atencion = tiempo_inicio + duracion
-
-    
 
     def _generar_motivo_llegada(self):
         rnd = random.random()
@@ -33,7 +27,16 @@ class Cliente:
         else:
             self.motivo_llegada = Motivo_Cliente.RBR
 
-    
+
+    def evento_llegada_cliente(self, reloj: float):
+        # EL CLIENTE LLEGA AL LOCAL ENTRE 13 Y 17 MINUTOS DESPUES DEL ULTIMO CLIENTE
+        self.tiempo_entre_llegada = random.uniform(13, 17)
+        self.tiempo_llegada = reloj + self.tiempo_entre_llegada
+        self._generar_motivo_llegada()
+
+
+
+
 
 
 
