@@ -156,6 +156,8 @@ class Simulacion:
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
             self.vector_estado_anterior = vector_estado
+            print(vector_estado)
 
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
+        return self.array_vector_estado_mostrar

@@ -30,8 +30,8 @@ class Cliente:
 
     def evento_llegada_cliente(self, reloj: float):
         # EL CLIENTE LLEGA AL LOCAL ENTRE 13 Y 17 MINUTOS DESPUES DEL ULTIMO CLIENTE
-        self.tiempo_entre_llegada = random.uniform(13, 17)
-        self.tiempo_llegada = reloj + self.tiempo_entre_llegada
+        self.tiempo_entre_llegada = round(random.uniform(13, 17),4)
+        self.tiempo_llegada = round(reloj + self.tiempo_entre_llegada,4)
         self._generar_motivo_llegada()
 
 
