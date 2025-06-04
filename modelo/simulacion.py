@@ -24,7 +24,11 @@ class Simulacion:
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
 
     def determinar_evento_asociado(
-        proximo_evento, cliente:Cliente, tiempo_fin_reparacion, tiempo_fin_limpieza, tiempo_fin_atencion
+        proximo_evento,
+        cliente: Cliente,
+        tiempo_fin_reparacion,
+        tiempo_fin_limpieza,
+        tiempo_fin_atencion,
     ):
         if proximo_evento == cliente.tiempo_llegada:
             return Evento.LC.value
@@ -45,13 +49,12 @@ class Simulacion:
         # EN EL ESTADO INICIAL LAS COLAS ESTAN EN CERO CON EXCEPCION DE LA COLA DE BICIS LISTAS PARA RETIRO
         # EL RELOJ ESTA EN CERO
 
-        
         # CREAMOS LA PRIMER LLEGADA DE UN CLIENTE
         cliente = Cliente(id_cliente, Estado_Cliente.SA.value)
         id_cliente += 1
         cliente.evento_llegada_cliente(reloj)
         cola_eventos.append(cliente.tiempo_llegada)
-        
+
         # TANTO EL MECACNICO COMO EL ASISTENTE ESTAN LIBRES
 
         # CON ESTOS DATOS INICIALES, CREAMOS EL PRIMER VECTOR DE ESTADO
@@ -64,55 +67,94 @@ class Simulacion:
             tiempo_atencion=0.0,
             tiempo_fin_atencion=0.0,
             estado_cliente=cliente.estado,
-            estado_asistente= self.asistente.estado,
+            estado_asistente=self.asistente.estado,
             cola_asistente=len(self.asistente.cola_atencion),
-            cola_bicis_listas_para_retiro=self.mecanico.cola_bicis_reparadas ,
+            cola_bicis_listas_para_retiro=self.mecanico.cola_bicis_reparadas,
             tiempo_reparacion=0.0,
             tiempo_fin_reparacion=0.0,
             estado_mecanico=self.mecanico.estado,
             cola_mecanico=len(self.mecanico.cola_mecanico),
-            tiempo_fin_limpieza=0.0
+            tiempo_fin_limpieza=0.0,
         )
 
         self.vector_estado_anterior = vector_estado
         if self.HORA_OBSERVAR == 0:
             self.array_vector_estado_mostrar.append(vector_estado)
-        
-        
+
         cant_iteraciones = 0
         # CON EL ESTADO INICIAL SETEADO PODEMOS INICIAR LA SIMULACION
         # MIENTRAS EL TIEMPO DE LA SIMULACION SEA MENOR AL DEFINIDO POR EL USUARIO O LA CANTIDAD DE ITERACIONES SEA MENOR O IGUAL A LA CANTIDAD MAXIMA DE ITERACIONES
-        while reloj < self.TIEMPO_SIMULACION and cant_iteraciones < CANT_MAXIMA_ITERACIONES:
+        while (
+            reloj < self.TIEMPO_SIMULACION
+            and cant_iteraciones < CANT_MAXIMA_ITERACIONES
+        ):
             # COMENZAREMOS BUSCANDO CUAL ES EL PROXIMO EVENTO, PARA ELLO BUSCAMOS EL QUE TENGA EL MENOR TIEMPO EN LA COLA DE EVENTO
-            prox_evento = min(cola_eventos);
+            prox_evento = min(cola_eventos)
             cola_eventos.remove(prox_evento)
             reloj = prox_evento
             # CON EL PROXIMO EVENTO DECIDIDO BUSCAMOS CUAL ES
-            prox_evento = self.determinar_evento_asociado(prox_evento, cliente, self.mecanico.tiempo_fin_reparacion, self.mecanico.tiempo_fin_limpieza, self.asistente.tiempo_fin_atencion)
+            prox_evento = self.determinar_evento_asociado(
+                prox_evento,
+                cliente,
+                self.mecanico.tiempo_fin_reparacion,
+                self.mecanico.tiempo_fin_limpieza,
+                self.asistente.tiempo_fin_atencion,
+            )
 
             # CON EL PROXIMO EVENTO DETERMINADO, DEFINIMOS COMO ACTUAR FRENTE A ÉL
             # TENEMOS 4 OPCIONES:
             # SI EL EVENTO ES UNA LLEGADA DE CLIENTE
-            # GENERAMOS UNA NUEVA LLEGADA DE CLIENTE
-            
+            # PONEMOS AL ASISTENTE A TRABAJAR Y GENERAMOS UNA NUEVA LLEGADA DE CLIENTE
+            if prox_evento == Evento.LC.value:
+                self.asistente.evento_atencion(cliente,reloj)
+                cliente = Cliente(id_cliente, Estado_Cliente.CREADO.value)
+                id_cliente += 1
+                cliente.evento_llegada_cliente(reloj)
+                cola_eventos.append(cliente.tiempo_llegada)
 
             # SI EL EVENTO ES UN FIN DE ATENCION SE ACTUALIZA AL ASISTENTE
+            elif prox_evento == Evento.FA.value:
+                self.asistente.evento_fin_atencion(reloj)
+                cola_eventos.append(self.asistente.tiempo_fin_atencion)
 
             # SI EL EVENTO ES UN FIN DE REPARACION SE ACTUALIZA AL MECANICO
+            elif prox_evento == Evento.FR.value:
+                self.mecanico.evento_fin_reparacion(reloj)
+                cola_eventos.append(self.mecanico.tiempo_fin_reparacion)
 
             # SI EL EVENTO ES UN FIN DE LIMPIEZA SE ACTUALIZA AL MECANICO Y SI EL MECANICO TIENE PENDIENTES REPARACIONES, SE INICIAN
-
+            elif prox_evento == Evento.FL.value:
+                self.mecanico.evento_finalizar_limpieza(reloj)
+                cola_eventos.append(self.mecanico.tiempo_fin_limpieza)
 
             # CON LAS 4 OPCIONES RESUELTAS, GENERAMOS EL NUEVO VECTOR DE ESTADO
-
+            vector_estado = Vector_Estado(
+                evento=prox_evento,
+                reloj=reloj,
+                tiempo_entre_llegadas=cliente.tiempo_entre_llegada,
+                hora_llegada=cliente.tiempo_llegada,
+                motivo=cliente.motivo_llegada,
+                tiempo_atencion= self.asistente.tiempo_atencion ,
+                tiempo_fin_atencion= self.asistente.tiempo_fin_atencion,
+                estado_cliente= cliente.estado,
+                estado_asistente= self.asistente.estado,
+                cola_asistente= len(self.asistente.cola_atencion),
+                cola_bicis_listas_para_retiro=self.mecanico.cola_bicis_reparadas,
+                tiempo_reparacion= self.mecanico.tiempo_reparacion ,
+                tiempo_fin_reparacion= self.mecanico.tiempo_fin_reparacion,
+                estado_mecanico=self.mecanico.estado,
+                cola_mecanico=len(self.mecanico.cola_mecanico),
+                tiempo_fin_limpieza= self.mecanico.tiempo_fin_limpieza,
+            )
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
-
-
+            if reloj <= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
+                self.array_vector_estado_mostrar.append(vector_estado)
+                self.CANT_ITERACIONES -= 1
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
-            self.vector_estado_anterior = vector_estado;
+            self.vector_estado_anterior = vector_estado
 
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)

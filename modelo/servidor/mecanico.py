@@ -36,7 +36,7 @@ class Mecanico:
         self.estado = Estado.LIMPIANDO.value
         self.tiempo_fin_limpieza = round(self.tiempo_limpieza + reloj, 4)
 
-    def finalizar_limpieza(self, reloj: float):
+    def evento_finalizar_limpieza(self, reloj: float):
         # AL FINALIZAR LA LIMPIEZA, SI HAY BICIS EN LA COLA DE REPARACION, SE OCUPA REPARANDO OTRA
         if self.cola_reparacion > 0:
             self.estado = Estado.OCUPADO.value
