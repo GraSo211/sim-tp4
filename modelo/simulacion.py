@@ -24,6 +24,7 @@ class Simulacion:
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
 
     def determinar_evento_asociado(
+        self,
         proximo_evento,
         cliente: Cliente,
         tiempo_fin_reparacion,
