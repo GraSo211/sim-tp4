@@ -24,11 +24,11 @@ class Simulacion:
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
 
     def determinar_evento_asociado(
-        proximo_evento, cliente, tiempo_fin_reparacion, tiempo_fin_limpieza
+        proximo_evento, cliente:Cliente, tiempo_fin_reparacion, tiempo_fin_limpieza, tiempo_fin_atencion
     ):
-        if proximo_evento == cliente.hora_llegada:
+        if proximo_evento == cliente.tiempo_llegada:
             return Evento.LC.value
-        elif proximo_evento == cliente.hora_fin_atencion:
+        elif proximo_evento == tiempo_fin_atencion:
             return Evento.FA.value
         elif proximo_evento == tiempo_fin_reparacion:
             return Evento.FR.value
@@ -48,6 +48,7 @@ class Simulacion:
         
         # CREAMOS LA PRIMER LLEGADA DE UN CLIENTE
         cliente = Cliente(id_cliente, Estado_Cliente.SA.value)
+        id_cliente += 1
         cliente.evento_llegada_cliente(reloj)
         cola_eventos.append(cliente.tiempo_llegada)
         
@@ -77,7 +78,41 @@ class Simulacion:
         if self.HORA_OBSERVAR == 0:
             self.array_vector_estado_mostrar.append(vector_estado)
         
+        
+        cant_iteraciones = 0
         # CON EL ESTADO INICIAL SETEADO PODEMOS INICIAR LA SIMULACION
+        # MIENTRAS EL TIEMPO DE LA SIMULACION SEA MENOR AL DEFINIDO POR EL USUARIO O LA CANTIDAD DE ITERACIONES SEA MENOR O IGUAL A LA CANTIDAD MAXIMA DE ITERACIONES
+        while reloj < self.TIEMPO_SIMULACION and cant_iteraciones < CANT_MAXIMA_ITERACIONES:
+            # COMENZAREMOS BUSCANDO CUAL ES EL PROXIMO EVENTO, PARA ELLO BUSCAMOS EL QUE TENGA EL MENOR TIEMPO EN LA COLA DE EVENTO
+            prox_evento = min(cola_eventos);
+            cola_eventos.remove(prox_evento)
+            reloj = prox_evento
+            # CON EL PROXIMO EVENTO DECIDIDO BUSCAMOS CUAL ES
+            prox_evento = self.determinar_evento_asociado(prox_evento, cliente, self.mecanico.tiempo_fin_reparacion, self.mecanico.tiempo_fin_limpieza, self.asistente.tiempo_fin_atencion)
+
+            # CON EL PROXIMO EVENTO DETERMINADO, DEFINIMOS COMO ACTUAR FRENTE A ÉL
+            # TENEMOS 4 OPCIONES:
+            # SI EL EVENTO ES UNA LLEGADA DE CLIENTE
+            # GENERAMOS UNA NUEVA LLEGADA DE CLIENTE
+            
+
+            # SI EL EVENTO ES UN FIN DE ATENCION SE ACTUALIZA AL ASISTENTE
+
+            # SI EL EVENTO ES UN FIN DE REPARACION SE ACTUALIZA AL MECANICO
+
+            # SI EL EVENTO ES UN FIN DE LIMPIEZA SE ACTUALIZA AL MECANICO Y SI EL MECANICO TIENE PENDIENTES REPARACIONES, SE INICIAN
 
 
-        id_cliente += 1
+            # CON LAS 4 OPCIONES RESUELTAS, GENERAMOS EL NUEVO VECTOR DE ESTADO
+
+
+            # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
+
+
+
+            # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
+            cant_iteraciones += 1
+            self.vector_estado_anterior = vector_estado;
+
+        # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
+        self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
