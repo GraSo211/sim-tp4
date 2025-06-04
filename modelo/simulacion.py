@@ -20,6 +20,7 @@ class Simulacion:
         self.asistente = Asistente()
         self.clientes: list[Cliente] = []
         self.vector_estado_anterior: Vector_Estado = None
+        self.array_vector_estado_mostrar: list[Vector_Estado] = []
 
     def simular_taller_bicicletas(self):
         # INICIA LA SIMULACION
@@ -64,7 +65,8 @@ class Simulacion:
             self.mecanico.estado,
             self.mecanico.cola_reparacion,
             tiempo_fin_limpieza
-
-
         )
-        print(vector_estado_actual)
+
+        self.array_vector_estado_mostrar.append(vector_estado_actual)
+
+        return self.array_vector_estado_mostrar

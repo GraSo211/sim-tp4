@@ -1,4 +1,7 @@
 import tkinter as tk
+from tkinter import ttk
+import tkinter.font as tkFont
+
 
 BG_COLOR = "#f5f5f5"
 FONT_TITLE = ("Montserrat", 32, "bold")
@@ -13,23 +16,28 @@ BTN_TEXT_COLOR = "white"
 
 
 class Vista(tk.Tk):
-    def __init__(self, ):
+    def __init__(
+        self,
+    ):
         super().__init__()
         self.title("SIMULACIÓN TP4 - GRUPO 6")
         self.geometry("1280x720")
         self.configure(bg=BG_COLOR)
         self._crear_widgets()
-     
 
     def callback_iniciar_simulacion(self, callback):
         self._callback_iniciar_simulacion = callback
-
 
     def _accion_iniciar_simulacion(self):
         if self._callback_iniciar_simulacion:
             self._callback_iniciar_simulacion()
 
+        # Ocultar los inputs y el botón
+        self.frame_sim.pack_forget()
+        self.frame_btn.pack_forget()
 
+        # Mostrar tabla en su lugar
+        self.frame_vector_estado.pack(fill="both", expand=True, pady=10, padx=10)
 
     def _titulo_ventana(self):
         frame_titulo = tk.Frame(self, bg=BG_COLOR)
@@ -105,21 +113,20 @@ class Vista(tk.Tk):
         self.cant_iteraciones.grid(row=3, column=1, padx=10, pady=10)
 
     def _iniciar_simulacion(self):
-        frame_btn = tk.Frame(self, bg=BG_COLOR)
-        frame_btn.pack(pady=20)
+        self.frame_btn = tk.Frame(self, bg=BG_COLOR)
+        self.frame_btn.pack(pady=20)
 
         btn_iniciar_sim = tk.Button(
-            frame_btn,
+            self.frame_btn,
             text="Iniciar simulación",
             font=FONT_LABEL,
             bg=BTN_COLOR,
             fg=BTN_TEXT_COLOR,
-            command=self._accion_iniciar_simulacion ,
+            command=self._accion_iniciar_simulacion,
             padx=20,
-            pady=10
+            pady=10,
         )
         btn_iniciar_sim.pack()
-
 
     def _crear_widgets(self):
         self._titulo_ventana()
@@ -142,4 +149,57 @@ class Vista(tk.Tk):
 
         self._iniciar_simulacion()
 
+        # Frame para mostrar vector_estado debajo de inputs
+        self.frame_vector_estado = tk.Frame(self, bg=BG_COLOR)
 
+        # Creamos el Treeview vacío inicialmente
+        self.tree_vector_estado = ttk.Treeview(self.frame_vector_estado)
+        self.tree_vector_estado.pack(fill="both", expand=True)
+
+
+    def mostrar_vector_estado(self, lista_vectores_estado):
+        # Limpiar frame por si ya hay un Treeview anterior
+        for widget in self.frame_vector_estado.winfo_children():
+            widget.destroy()
+
+        # Scrollbars
+        scroll_y = tk.Scrollbar(self.frame_vector_estado, orient="vertical")
+        scroll_y.pack(side="right", fill="y")
+
+        scroll_x = tk.Scrollbar(self.frame_vector_estado, orient="horizontal")
+        scroll_x.pack(side="bottom", fill="x")
+
+        # Treeview
+        self.tree_vector_estado = ttk.Treeview(
+            self.frame_vector_estado,
+            yscrollcommand=scroll_y.set,
+            xscrollcommand=scroll_x.set
+        )
+        self.tree_vector_estado.pack(fill="both", expand=True)
+
+        # Vincular scrollbars al Treeview
+        scroll_y.config(command=self.tree_vector_estado.yview)
+        scroll_x.config(command=self.tree_vector_estado.xview)
+
+        if not lista_vectores_estado:
+            self.tree_vector_estado["columns"] = []
+            return
+
+        # Obtener atributos públicos del primer vector
+        primer_vector = lista_vectores_estado[0]
+        atributos = [
+            attr
+            for attr in dir(primer_vector)
+            if not attr.startswith("_") and not callable(getattr(primer_vector, attr))
+        ]
+
+        self.tree_vector_estado["columns"] = atributos
+        self.tree_vector_estado["show"] = "headings"
+
+        for attr in atributos:
+            self.tree_vector_estado.heading(attr, text=attr)
+            self.tree_vector_estado.column(attr, anchor="center", width=120)  # ancho fijo
+
+        for vector in lista_vectores_estado:
+            valores = [getattr(vector, attr) for attr in atributos]
+            self.tree_vector_estado.insert("", tk.END, values=valores)

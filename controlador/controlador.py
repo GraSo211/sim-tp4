@@ -39,7 +39,8 @@ class Controlador:
         self.modelo = Simulacion(tiempo_duracion, hora_observar, cant_iteraciones)
 
 
-        self.modelo.simular_taller_bicicletas()
+        array_vector_estado = self.modelo.simular_taller_bicicletas()
+        self.vista.mostrar_vector_estado(array_vector_estado);
 
     def validar_tiempo(self):
         status = False
