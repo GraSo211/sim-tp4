@@ -37,6 +37,10 @@ class Cliente:
 
 
 
+    def __str__(self):
+        return (f"Cliente(id={self.id}, estado={self.estado if self.estado else 'None'}, "
+            f"motivo_llegada={self.motivo_llegada})")
 
 
-
+    def __repr__(self):
+        return self.__str__()

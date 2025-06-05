@@ -185,7 +185,7 @@ class Vista(tk.Tk):
             self.tree_vector_estado["columns"] = []
             return
 
-
+        # Atributos del vector de estado
         atributos = [
             "evento",
             "reloj",
@@ -205,17 +205,24 @@ class Vista(tk.Tk):
             "cont_retirar_bici",
             "cont_retirar_bici_no_reparada",
             "acum_tiempo_ocupacion_asistente",
-            "acum_tiempo_ocupacion_mecanico"
+            "acum_tiempo_ocupacion_mecanico",
         ]
 
-
-        self.tree_vector_estado["columns"] = atributos
+        columnas = atributos + ["id_cliente", "estado_cliente"]
+        self.tree_vector_estado["columns"] = columnas
         self.tree_vector_estado["show"] = "headings"
 
-        for attr in atributos:
-            self.tree_vector_estado.heading(attr, text=attr)
-            self.tree_vector_estado.column(attr, anchor="center", width=150)  # ancho fijo
+        for col in columnas:
+            self.tree_vector_estado.heading(col, text=col)
+            self.tree_vector_estado.column(col, anchor="center", width=150)
 
         for vector in lista_vectores_estado:
             valores = [getattr(vector, attr) for attr in atributos]
+
+            if vector.cliente:
+                valores.append(vector.cliente.id)
+                valores.append(vector.cliente.estado)
+            else:
+                valores.extend(["", ""])
+
             self.tree_vector_estado.insert("", tk.END, values=valores)

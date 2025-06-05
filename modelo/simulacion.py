@@ -23,6 +23,7 @@ class Simulacion:
         self.asistente = Asistente()
         self.vector_estado_anterior: Vector_Estado = None
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
+        self.cliente: Cliente = None
         # PARA ESTADISTICAS SE NOS PIDE:
         # PROBABILIDAD DE QUE EL CLIENTE LLEGUE A RETIRAR UNA BICI Y NO ESTE REPARADA
         # PORCENTAJE DE OCUPACION DEL ASISTENTE Y MECANICO
@@ -64,7 +65,7 @@ class Simulacion:
         id_cliente += 1
         cliente.evento_llegada_cliente(reloj)
         cola_eventos.append((cliente.tiempo_llegada, Evento.LC.value, cliente ))
-
+        
         # TANTO EL MECACNICO COMO EL ASISTENTE ESTAN LIBRES
 
         # CON ESTOS DATOS INICIALES, CREAMOS EL PRIMER VECTOR DE ESTADO
@@ -88,7 +89,8 @@ class Simulacion:
             cont_retirar_bici= self.cont_retirar_bici,
             cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada,
             acum_tiempo_ocupacion_asistente = 0.0,
-            acum_tiempo_ocupacion_mecanico = 0.0
+            acum_tiempo_ocupacion_mecanico = 0.0,
+            cliente=self.cliente
         )
 
         self.vector_estado_anterior = vector_estado
@@ -121,7 +123,7 @@ class Simulacion:
             if evento_actual[1] == Evento.LC.value:
                 
                 self.asistente.evento_atencion(evento_actual[2],reloj)
-
+                self.cliente = evento_actual[2]
 
                 # SI SU MOTIVO DE LLEGADA ES ENTREGAR UNA BICI ENTONCES EL MECANICO SE PONE A REPARAR
                 
@@ -144,6 +146,7 @@ class Simulacion:
 
             # SI EL EVENTO ES UN FIN DE ATENCION SE ACTUALIZA AL ASISTENTE
             elif evento_actual[1] == Evento.FA.value:
+                
                 if(evento_actual[2].motivo_llegada == Motivo_Cliente.RBR.value):
                     self.cont_retirar_bici += 1
                     if self.cola_bicis_reparadas > 0:
@@ -151,9 +154,8 @@ class Simulacion:
                     else:
                         self.cont_retirar_bici_no_reparada += 1
                     
-                        
                 self.asistente.evento_fin_atencion(reloj)
-
+                
                 if self.asistente.estado == Estado_Asistente.OCUPADO.value:
                     cola_eventos.append((self.asistente.tiempo_fin_atencion, Evento.FA.value, self.asistente))
 
@@ -197,7 +199,8 @@ class Simulacion:
                 cont_retirar_bici= self.cont_retirar_bici,
                 cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada,
                 acum_tiempo_ocupacion_asistente = round(self.acum_tiempo_ocupacion_asistente,4),
-                acum_tiempo_ocupacion_mecanico = round(self.acum_tiempo_ocupacion_mecanico,4)
+                acum_tiempo_ocupacion_mecanico = round(self.acum_tiempo_ocupacion_mecanico,4),
+                cliente = self.cliente
             )
             
             # PARA ESTADISTICAS DE OCUPACION ANTES DE ITERAR ACUMULAMOS SI Y SOLO SI ESTAN OCUPADOS}
@@ -213,18 +216,21 @@ class Simulacion:
 
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
+            
+            if reloj >= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
+                self.array_vector_estado_mostrar.append(vector_estado)
+                self.CANT_ITERACIONES -= 1
             # ! POR EL MOMENTO PARA DEBUG SE AGREGAN TODAS
-            #if reloj >= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
-            #    self.array_vector_estado_mostrar.append(vector_estado)
-            #    self.CANT_ITERACIONES -= 1
-
             # ! BORRAR DESPUES:
-            self.array_vector_estado_mostrar.append(vector_estado)
+            # !self.array_vector_estado_mostrar.append(vector_estado)
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
             self.vector_estado_anterior = vector_estado
+            print("\n\n\n", cant_iteraciones,"cliente:",self.cliente,"\n\n\n")
 
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
+        print("PORCENTAJE DE OCUPACION DE ASISTENTE:", (self.acum_tiempo_ocupacion_asistente/self.vector_estado_anterior.reloj)*100)
+        print("PORCENTAJE DE OCUPACION DE MECANICO:", (self.acum_tiempo_ocupacion_mecanico/self.vector_estado_anterior.reloj)*100)
         return self.array_vector_estado_mostrar
