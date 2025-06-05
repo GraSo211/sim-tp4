@@ -195,12 +195,15 @@ class Vista(tk.Tk):
             "tiempo_atencion",
             "tiempo_fin_atencion",
             "estado_asistente",
+            "cola_asistente",
             "cola_bicis_listas_para_retiro",
             "tiempo_reparacion",
             "tiempo_fin_reparacion",
             "estado_mecanico",
             "cola_mecanico",
-            "tiempo_fin_limpieza"
+            "tiempo_fin_limpieza",
+            "cont_retirar_bici",
+            "cont_retirar_bici_no_reparada"
         ]
 
 

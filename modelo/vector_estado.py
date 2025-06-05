@@ -23,6 +23,8 @@ class Vector_Estado:
         estado_mecanico: Estado_Servidor,
         cola_mecanico: int,
         tiempo_fin_limpieza: float,
+        cont_retirar_bici: int,
+        cont_retirar_bici_no_reparada: int,
     ):
         self.evento: Evento = evento
         self.reloj: float = reloj
@@ -40,7 +42,9 @@ class Vector_Estado:
         self.estado_mecanico: Estado_Servidor = estado_mecanico
         self.cola_mecanico: int = cola_mecanico
         self.tiempo_fin_limpieza: float = tiempo_fin_limpieza
-        # todo agregar al vector estado los acumuladores
+        # todo: agregar al vector estado los acumuladores
+        self.cont_retirar_bici = cont_retirar_bici
+        self.cont_retirar_bici_no_reparada = cont_retirar_bici_no_reparada
 
     def __str__(self):
         return (

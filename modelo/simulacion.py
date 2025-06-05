@@ -23,6 +23,14 @@ class Simulacion:
         self.asistente = Asistente()
         self.vector_estado_anterior: Vector_Estado = None
         self.array_vector_estado_mostrar: list[Vector_Estado] = []
+        # PARA ESTADISTICAS SE NOS PIDE:
+        # PROBABILIDAD DE QUE EL CLIENTE LLEGUE A RETIRAR UNA BICI Y NO ESTE REPARADA
+        # PORCENTAJE DE OCUPACION DEL ASISTENTE Y MECANICO
+        self.cont_retirar_bici = 0
+        self.cont_retirar_bici_no_reparada = 0
+        self.acum_tiempo_ocupacion_asistente = 0.0
+        self.acum_tiempo_ocupacion_mecanico = 0.0
+
 
     def determinar_evento_asociado(
         self,
@@ -77,6 +85,8 @@ class Simulacion:
             estado_mecanico=self.mecanico.estado,
             cola_mecanico=self.mecanico.cola_reparacion,
             tiempo_fin_limpieza=0.0,
+            cont_retirar_bici= self.cont_retirar_bici,
+            cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada
         )
 
         self.vector_estado_anterior = vector_estado
@@ -87,7 +97,6 @@ class Simulacion:
 
 
 
-        print("\n\n\n\nANTES DE ENTRAR AL WHILE LA COLA DE EVENTOS ES:", cola_eventos,"\n\n\n\n")
         # CON EL ESTADO INICIAL SETEADO PODEMOS INICIAR LA SIMULACION
         # MIENTRAS EL TIEMPO DE LA SIMULACION SEA MENOR AL DEFINIDO POR EL USUARIO O LA CANTIDAD DE ITERACIONES SEA MENOR O IGUAL A LA CANTIDAD MAXIMA DE ITERACIONES
         while (
@@ -95,10 +104,6 @@ class Simulacion:
             and cant_iteraciones < CANT_MAXIMA_ITERACIONES
         ):
             
-
-            if not cola_eventos:
-                print("No hay más eventos para procesar. Fin anticipado de la simulación.")
-                break
             # COMENZAREMOS BUSCANDO CUAL ES EL PROXIMO EVENTO, PARA ELLO BUSCAMOS EL QUE TENGA EL MENOR TIEMPO EN LA COLA DE EVENTO
             evento_actual = min(cola_eventos)
             cola_eventos.remove(evento_actual)
@@ -117,14 +122,15 @@ class Simulacion:
 
 
                 # SI SU MOTIVO DE LLEGADA ES ENTREGAR UNA BICI ENTONCES EL MECANICO SE PONE A REPARAR
-                if evento_actual[2].motivo_llegada == Motivo_Cliente.EBR.value :
+                
+                if evento_actual[2].motivo_llegada == Motivo_Cliente.EBR.value:
                     self.mecanico.evento_reparacion(reloj)
                     if self.mecanico.cola_reparacion == 0 :
                         cola_eventos.append((self.mecanico.tiempo_fin_reparacion, Evento.FR.value,self.mecanico))
 
                 
                 # GENERAMOS EL FIN DE ATENCION SEA CUAL SEA SU MOTIVO DE LLEGADA
-                cola_eventos.append((self.asistente.tiempo_fin_atencion, Evento.FA.value, self.asistente))
+                cola_eventos.append((self.asistente.tiempo_fin_atencion, Evento.FA.value, evento_actual[2]))
                 
             
                 
@@ -136,14 +142,12 @@ class Simulacion:
 
             # SI EL EVENTO ES UN FIN DE ATENCION SE ACTUALIZA AL ASISTENTE
             elif evento_actual[1] == Evento.FA.value:
-                if(len(self.asistente.cola_atencion)>0):
-                    cliente = self.asistente.cola_atencion[0]
-                    if(cliente.motivo_llegada == Motivo_Cliente.RBR.value):
-                        if self.cola_bicis_reparadas > 0:
-                            self.cola_bicis_reparadas -= 1
-                        else:
-                            #todo: aca va a ir la estadistica de cliente quiso retirar una bicicleta y no habia
-                            pass
+                if(evento_actual[2].motivo_llegada == Motivo_Cliente.RBR.value):
+                    self.cont_retirar_bici += 1
+                    if self.cola_bicis_reparadas > 0:
+                        self.cola_bicis_reparadas -= 1
+                    else:
+                        self.cont_retirar_bici_no_reparada += 1
                     
                         
                 self.asistente.evento_fin_atencion(reloj)
@@ -185,23 +189,23 @@ class Simulacion:
                 estado_mecanico=self.mecanico.estado,
                 cola_mecanico=self.mecanico.cola_reparacion,
                 tiempo_fin_limpieza= self.mecanico.tiempo_fin_limpieza,
+                cont_retirar_bici= self.cont_retirar_bici,
+                cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada
             )
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
             # ! POR EL MOMENTO PARA DEBUG SE AGREGAN TODAS
-            #if reloj <= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
+            #if reloj >= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
             #    self.array_vector_estado_mostrar.append(vector_estado)
             #    self.CANT_ITERACIONES -= 1
 
             # ! BORRAR DESPUES:
-
             self.array_vector_estado_mostrar.append(vector_estado)
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
             self.vector_estado_anterior = vector_estado
-            print(vector_estado)
-            print("\n\n\n\nANTES DE HACER LA SIGUIENTE ITERACION LA COLA DE EVENTOS ES:", cola_eventos,"\n\n\n\n")
+
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
         return self.array_vector_estado_mostrar
