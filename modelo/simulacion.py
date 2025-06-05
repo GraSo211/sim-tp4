@@ -6,7 +6,7 @@ from modelo.cliente.estado_cliente import Estado_Cliente
 from modelo.evento import Evento
 from modelo.cliente.motivo_cliente import Motivo_Cliente
 from modelo.servidor.estado_asistente import Estado as Estado_Asistente
-
+from modelo.servidor.estado_mecanico import Estado as Estado_Mecanico
 
 CANT_MAXIMA_ITERACIONES = 100000
 BICIS_REPARADAS = 3
@@ -55,7 +55,7 @@ class Simulacion:
         cliente = Cliente(id_cliente, Estado_Cliente.SA.value)
         id_cliente += 1
         cliente.evento_llegada_cliente(reloj)
-        cola_eventos.append((cliente.tiempo_llegada, evento, cliente ))
+        cola_eventos.append((cliente.tiempo_llegada, Evento.LC.value, cliente ))
 
         # TANTO EL MECACNICO COMO EL ASISTENTE ESTAN LIBRES
 
@@ -84,12 +84,21 @@ class Simulacion:
             self.array_vector_estado_mostrar.append(vector_estado)
 
         cant_iteraciones = 0
+
+
+
+        print("\n\n\n\nANTES DE ENTRAR AL WHILE LA COLA DE EVENTOS ES:", cola_eventos,"\n\n\n\n")
         # CON EL ESTADO INICIAL SETEADO PODEMOS INICIAR LA SIMULACION
         # MIENTRAS EL TIEMPO DE LA SIMULACION SEA MENOR AL DEFINIDO POR EL USUARIO O LA CANTIDAD DE ITERACIONES SEA MENOR O IGUAL A LA CANTIDAD MAXIMA DE ITERACIONES
         while (
             reloj < self.TIEMPO_SIMULACION
             and cant_iteraciones < CANT_MAXIMA_ITERACIONES
         ):
+            
+
+            if not cola_eventos:
+                print("No hay más eventos para procesar. Fin anticipado de la simulación.")
+                break
             # COMENZAREMOS BUSCANDO CUAL ES EL PROXIMO EVENTO, PARA ELLO BUSCAMOS EL QUE TENGA EL MENOR TIEMPO EN LA COLA DE EVENTO
             evento_actual = min(cola_eventos)
             cola_eventos.remove(evento_actual)
@@ -97,54 +106,66 @@ class Simulacion:
 
             # CON EL PROXIMO EVENTO DETERMINADO, DEFINIMOS COMO ACTUAR FRENTE A ÉL
             # TENEMOS 4 OPCIONES:
-            # SI EL EVENTO ES UNA LLEGADA DE CLIENTE
-            # PONEMOS AL ASISTENTE A TRABAJAR Y GENERAMOS UNA NUEVA LLEGADA DE CLIENTE
+            # SI EL EVENTO ES UNA LLEGADA DE CLIENTE SUCEDE LOS SIGUIENTE
+            # EN CUANTO LLEGA UN CLIENTE, INICIAMOS LA LLEGADA DEL PROXIMO,
+            # SI EL CLIENTE VIENE A COMPRAR ACCESORIOS SE GENERA SU FIN DE ATENCION
+            # SI VIENE A RETIRAR BICICLETA SE GENERA SU FIN DE ATENCION (Y AHI DESCONTAMOS LA BICI)
+            # SI VIENE A ENTREGAR BICICLETA, SE GENERA SU FIN DE ATENCION Y SE GENERA EL EVENTO REPARACION
             if evento_actual[1] == Evento.LC.value:
                 
                 self.asistente.evento_atencion(evento_actual[2],reloj)
+
+
+                # SI SU MOTIVO DE LLEGADA ES ENTREGAR UNA BICI ENTONCES EL MECANICO SE PONE A REPARAR
+                if evento_actual[2].motivo_llegada == Motivo_Cliente.EBR.value :
+                    self.mecanico.evento_reparacion(reloj)
+                    if self.mecanico.cola_reparacion == 0 :
+                        cola_eventos.append((self.mecanico.tiempo_fin_reparacion, Evento.FR.value,self.mecanico))
+
+                
+                # GENERAMOS EL FIN DE ATENCION SEA CUAL SEA SU MOTIVO DE LLEGADA
                 cola_eventos.append((self.asistente.tiempo_fin_atencion, Evento.FA.value, self.asistente))
+                
+            
+                
+                # GENERACION DEL PROXIMO CLIENTE
                 cliente = Cliente(id_cliente, Estado_Cliente.CREADO.value)
                 id_cliente += 1
                 cliente.evento_llegada_cliente(reloj)
-                
                 cola_eventos.append((cliente.tiempo_llegada, Evento.LC.value, cliente))
-                # TODO: EN EL CASO DE LAS LLEGADAS CLIENTES, SIEMPRE QUE HAY UN EVENTO DE LA LLEGADA CLIENTE GENERAMOS UNO NUEVO ASI QUE EN ESTE NO HACE FALTA CONDICIONAL.
 
             # SI EL EVENTO ES UN FIN DE ATENCION SE ACTUALIZA AL ASISTENTE
             elif evento_actual[1] == Evento.FA.value:
                 if(len(self.asistente.cola_atencion)>0):
                     cliente = self.asistente.cola_atencion[0]
-                    if(cliente.motivo_llegada == Motivo_Cliente.RBR):
+                    if(cliente.motivo_llegada == Motivo_Cliente.RBR.value):
                         if self.cola_bicis_reparadas > 0:
                             self.cola_bicis_reparadas -= 1
                         else:
                             #todo: aca va a ir la estadistica de cliente quiso retirar una bicicleta y no habia
                             pass
-                    elif cliente.motivo_llegada == Motivo_Cliente.EBR:
-                        self.mecanico.evento_reparacion(reloj)
-                        if self.mecanico.cola_reparacion == 0:
-                            cola_eventos.append((self.mecanico.evento_reparacion))
+                    
+                        
                 self.asistente.evento_fin_atencion(reloj)
 
                 if self.asistente.estado == Estado_Asistente.OCUPADO.value:
                     cola_eventos.append((self.asistente.tiempo_fin_atencion, Evento.FA.value, self.asistente))
 
-                # TODO: REVISAR POR LAS DUDAS DE QUE AL FINALIZAR UNA ATENCION DEBE HACERSE LO SIGUIENTE:
-                # TODO: SI EL ASISTENTE TIENE CLIENTES EN LA COLA SE LOS ATIENDE, SI NO QUEDA LIBRE, PERO NO DEBERIA GENERARSE UN NUEVO EVENTO EN ESE CASO.
+
 
             # SI EL EVENTO ES UN FIN DE REPARACION SE ACTUALIZA AL MECANICO
             elif evento_actual[1] == Evento.FR.value:
                 self.mecanico.evento_fin_reparacion(reloj)
                 self.cola_bicis_reparadas +=1
+                cola_eventos.append((self.mecanico.tiempo_fin_limpieza, Evento.FL.value, self.mecanico))
 
-                # TODO: CORREGIR CUANDO FINALIZA UNA REPARACION EL NUEVO EVENTO QUE SE CREA ES EL DE LIMPIEZA, NO OTRA REPARACION
-                cola_eventos.append((self.mecanico.tiempo_fin_reparacion, Evento.FR.value, self.mecanico))
 
             # SI EL EVENTO ES UN FIN DE LIMPIEZA SE ACTUALIZA AL MECANICO Y SI EL MECANICO TIENE PENDIENTES REPARACIONES, SE INICIAN
             elif evento_actual[1] == Evento.FL.value:
                 self.mecanico.evento_finalizar_limpieza(reloj)
-                # TODO: CORREGIR CUANDO FINALIZA LA LIMPIEZA EL NUEVO EVENTO QUE SE GENERA ES REPARACION SI HAY BICICLETAS EN LA COLA, SI NO NO SE AGREGA NADA
-                cola_eventos.append((self.mecanico.tiempo_fin_limpieza, Evento.FL.value, self.mecanico))
+                if(self.mecanico.estado == Estado_Mecanico.OCUPADO.value):
+                    cola_eventos.append((self.mecanico.tiempo_fin_reparacion, Evento.FR.value, self.mecanico))
+
 
             # CON LAS 4 OPCIONES RESUELTAS, GENERAMOS EL NUEVO VECTOR DE ESTADO
             vector_estado = Vector_Estado(
@@ -167,15 +188,20 @@ class Simulacion:
             )
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
-            if reloj <= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
-                self.array_vector_estado_mostrar.append(vector_estado)
-                self.CANT_ITERACIONES -= 1
+            # ! POR EL MOMENTO PARA DEBUG SE AGREGAN TODAS
+            #if reloj <= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
+            #    self.array_vector_estado_mostrar.append(vector_estado)
+            #    self.CANT_ITERACIONES -= 1
+
+            # ! BORRAR DESPUES:
+
+            self.array_vector_estado_mostrar.append(vector_estado)
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
             self.vector_estado_anterior = vector_estado
             print(vector_estado)
-
+            print("\n\n\n\nANTES DE HACER LA SIGUIENTE ITERACION LA COLA DE EVENTOS ES:", cola_eventos,"\n\n\n\n")
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
         return self.array_vector_estado_mostrar

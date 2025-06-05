@@ -185,13 +185,24 @@ class Vista(tk.Tk):
             self.tree_vector_estado["columns"] = []
             return
 
-        # Obtener atributos públicos del primer vector
-        primer_vector = lista_vectores_estado[0]
+
         atributos = [
-            attr
-            for attr in dir(primer_vector)
-            if not attr.startswith("_") and not callable(getattr(primer_vector, attr))
+            "evento",
+            "reloj",
+            "tiempo_entre_llegadas",
+            "hora_llegada",
+            "motivo",
+            "tiempo_atencion",
+            "tiempo_fin_atencion",
+            "estado_asistente",
+            "cola_bicis_listas_para_retiro",
+            "tiempo_reparacion",
+            "tiempo_fin_reparacion",
+            "estado_mecanico",
+            "cola_mecanico",
+            "tiempo_fin_limpieza"
         ]
+
 
         self.tree_vector_estado["columns"] = atributos
         self.tree_vector_estado["show"] = "headings"
