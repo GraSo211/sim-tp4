@@ -3,11 +3,10 @@ import random
 
 
 class Mecanico:
-    def __init__(self, cola_bicis_reparadas: int):
+    def __init__(self,):
         self.estado: Estado = Estado.LIBRE.value
         self.tiempo_limpieza: float = 5.0
         self.cola_reparacion = 0
-        self.cola_bicis_reparadas = cola_bicis_reparadas
         self.tiempo_reparacion = 0.0
         self.tiempo_fin_limpieza: float = 0.0
         self.tiempo_fin_reparacion: float = 0.0
