@@ -86,7 +86,9 @@ class Simulacion:
             cola_mecanico=self.mecanico.cola_reparacion,
             tiempo_fin_limpieza=0.0,
             cont_retirar_bici= self.cont_retirar_bici,
-            cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada
+            cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada,
+            acum_tiempo_ocupacion_asistente = 0.0,
+            acum_tiempo_ocupacion_mecanico = 0.0
         )
 
         self.vector_estado_anterior = vector_estado
@@ -170,6 +172,9 @@ class Simulacion:
                 if(self.mecanico.estado == Estado_Mecanico.OCUPADO.value):
                     cola_eventos.append((self.mecanico.tiempo_fin_reparacion, Evento.FR.value, self.mecanico))
 
+            
+
+
 
             # CON LAS 4 OPCIONES RESUELTAS, GENERAMOS EL NUEVO VECTOR DE ESTADO
             vector_estado = Vector_Estado(
@@ -190,8 +195,22 @@ class Simulacion:
                 cola_mecanico=self.mecanico.cola_reparacion,
                 tiempo_fin_limpieza= self.mecanico.tiempo_fin_limpieza,
                 cont_retirar_bici= self.cont_retirar_bici,
-                cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada
+                cont_retirar_bici_no_reparada= self.cont_retirar_bici_no_reparada,
+                acum_tiempo_ocupacion_asistente = round(self.acum_tiempo_ocupacion_asistente,4),
+                acum_tiempo_ocupacion_mecanico = round(self.acum_tiempo_ocupacion_mecanico,4)
             )
+            
+            # PARA ESTADISTICAS DE OCUPACION ANTES DE ITERAR ACUMULAMOS SI Y SOLO SI ESTAN OCUPADOS}
+            tiempo_actual = vector_estado.reloj
+            tiempo_anterior = self.vector_estado_anterior.reloj
+            if self.mecanico.estado == Estado_Mecanico.OCUPADO.value:
+                self.acum_tiempo_ocupacion_mecanico += round(tiempo_actual - tiempo_anterior,4)
+
+            if self.asistente.estado == Estado_Asistente.OCUPADO.value:
+                self.acum_tiempo_ocupacion_asistente += self.asistente.tiempo_atencion
+
+
+
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
             # ! POR EL MOMENTO PARA DEBUG SE AGREGAN TODAS

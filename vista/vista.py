@@ -203,7 +203,9 @@ class Vista(tk.Tk):
             "cola_mecanico",
             "tiempo_fin_limpieza",
             "cont_retirar_bici",
-            "cont_retirar_bici_no_reparada"
+            "cont_retirar_bici_no_reparada",
+            "acum_tiempo_ocupacion_asistente",
+            "acum_tiempo_ocupacion_mecanico"
         ]
 
 
@@ -212,7 +214,7 @@ class Vista(tk.Tk):
 
         for attr in atributos:
             self.tree_vector_estado.heading(attr, text=attr)
-            self.tree_vector_estado.column(attr, anchor="center", width=120)  # ancho fijo
+            self.tree_vector_estado.column(attr, anchor="center", width=150)  # ancho fijo
 
         for vector in lista_vectores_estado:
             valores = [getattr(vector, attr) for attr in atributos]
