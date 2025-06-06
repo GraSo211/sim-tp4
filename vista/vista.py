@@ -149,7 +149,7 @@ class Vista(tk.Tk):
 
         self._iniciar_simulacion()
 
-        # Frame para mostrar vector_estado debajo de inputs
+
         self.frame_vector_estado = tk.Frame(self, bg=BG_COLOR)
 
         # Creamos el Treeview vacío inicialmente
@@ -157,45 +157,39 @@ class Vista(tk.Tk):
         self.tree_vector_estado.pack(fill="both", expand=True)
 
 
-    def mostrar_vector_estado(self, lista_vectores_estado):
+    def mostrar_vector_estado(self, lista_vectores_estado, prob_cliente_retirar_bicicleta_no_disp, porc_ocup_mec, porc_ocup_asist):
         # Limpiar frame por si ya hay un Treeview anterior
         for widget in self.frame_vector_estado.winfo_children():
             widget.destroy()
 
+        # === Crear frames para organizar verticalmente ===
+        frame_superior = tk.Frame(self.frame_vector_estado)
+        frame_superior.pack(fill=tk.BOTH, expand=True)
+
+        frame_inferior = tk.Frame(self.frame_vector_estado)
+        frame_inferior.pack(fill=tk.X)
+
         # Atributos del vector de estado
         atributos = [
-            "evento",
-            "reloj",
-            "tiempo_entre_llegadas",
-            "hora_llegada",
-            "motivo",
-            "tiempo_atencion",
-            "tiempo_fin_atencion",
-            "estado_asistente",
-            "cola_asistente",
-            "cola_bicis_listas_para_retiro",
-            "tiempo_reparacion",
-            "tiempo_fin_reparacion",
-            "estado_mecanico",
-            "cola_mecanico",
-            "tiempo_fin_limpieza",
-            "cont_retirar_bici",
-            "cont_retirar_bici_no_reparada",
-            "acum_tiempo_ocupacion_asistente",
-            "acum_tiempo_ocupacion_mecanico",
+            "evento", "reloj", "tiempo_entre_llegadas", "hora_llegada", "motivo",
+            "tiempo_atencion", "tiempo_fin_atencion", "estado_asistente", "cola_asistente",
+            "cola_bicis_listas_para_retiro", "tiempo_reparacion", "tiempo_fin_reparacion",
+            "estado_mecanico", "cola_mecanico", "tiempo_fin_limpieza",
+            "cont_retirar_bici", "cont_retirar_bici_no_reparada",
+            "acum_tiempo_ocupacion_asistente", "acum_tiempo_ocupacion_mecanico",
         ]
 
         columnas = atributos + ["id_cliente", "estado_cliente"]
 
-        # Frame contenedor del Treeview y scrollbars
-        frame_tabla = tk.Frame(self.frame_vector_estado)
+        # Frame contenedor de tabla y scrollbars
+        frame_tabla = tk.Frame(frame_superior)
         frame_tabla.pack(fill=tk.BOTH, expand=True)
 
         # Scrollbars
         scroll_y = tk.Scrollbar(frame_tabla, orient=tk.VERTICAL)
         scroll_x = tk.Scrollbar(frame_tabla, orient=tk.HORIZONTAL)
 
-        # Treeview con scroll
+        # Treeview
         self.tree_vector_estado = ttk.Treeview(
             frame_tabla,
             columns=columnas,
@@ -218,21 +212,33 @@ class Vista(tk.Tk):
 
         self.tree_vector_estado.pack(fill=tk.BOTH, expand=True)
 
-        # Insertar los valores
+        # Insertar datos
         for vector in lista_vectores_estado:
             valores = [getattr(vector, attr) for attr in atributos]
-
             if vector.cliente:
                 valores.append(vector.cliente.id)
                 valores.append(vector.cliente.estado)
             else:
                 valores.extend(["", ""])
-
             self.tree_vector_estado.insert("", tk.END, values=valores)
 
-        # Botón para reiniciar la simulación
+        # === Mostrar resultados debajo ===
+        label_resultados = tk.Label(
+            frame_inferior,
+            text=f"Probabilidad de que un cliente llegue a retirar una bicicleta y que aún no esté reparada: {prob_cliente_retirar_bicicleta_no_disp:.2%}\n"
+                f"Porcentaje de ocupación del mecánico: {porc_ocup_mec:.2%}\n"
+                f"Porcentaje de ocupación del asistente: {porc_ocup_asist:.2%}",
+            font=FONT_LABEL,
+            justify="center",
+            anchor="center",
+            padx=20,
+            pady=10
+        )
+        label_resultados.pack(pady=(10, 0), fill=tk.X, expand=True)
+
+        # === Botón de reinicio debajo ===
         btn_reiniciar = tk.Button(
-            self.frame_vector_estado,
+            frame_inferior,
             text="Reiniciar simulación",
             font=FONT_LABEL,
             bg="#f44336",
@@ -243,17 +249,15 @@ class Vista(tk.Tk):
         )
         btn_reiniciar.pack(pady=20)
 
-
-
     def _reiniciar_simulacion(self):
-        # Mostrar campos de entrada y botón de iniciar
+        # MOSTRAMOS DE VUELTA LOS INPUTS Y EL BOTON INICIAR
         self.frame_sim.pack(pady=10)
         self.frame_btn.pack(pady=20)
 
-        # Ocultar tabla
+        # OCULTAMOS LA TABLA
         self.frame_vector_estado.pack_forget()
 
-        # Limpiar campos
+        # PONEMOS EN 0 LOS CAMPOS
         self.tiempo_duracion.delete(0, tk.END)
         self.hora_observar.delete(0, tk.END)
         self.cant_iteraciones.delete(0, tk.END)

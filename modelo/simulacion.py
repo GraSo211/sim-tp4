@@ -220,17 +220,19 @@ class Simulacion:
             if reloj >= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
                 self.array_vector_estado_mostrar.append(vector_estado)
                 self.CANT_ITERACIONES -= 1
-            # ! POR EL MOMENTO PARA DEBUG SE AGREGAN TODAS
-            # ! BORRAR DESPUES:
-            # !self.array_vector_estado_mostrar.append(vector_estado)
+
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO
             cant_iteraciones += 1
             self.vector_estado_anterior = vector_estado
-            print("\n\n\n", cant_iteraciones,"cliente:",self.cliente,"\n\n\n")
+
 
         # TAMBIEN NOS PIDEN LA ULTIMA FILA DE LA SIMULACION ASI QUE AL SALIR DEL CICLO AGREGAMOS EL ULTIMO VECTOR GENERADO
         self.array_vector_estado_mostrar.append(self.vector_estado_anterior)
-        print("PORCENTAJE DE OCUPACION DE ASISTENTE:", (self.acum_tiempo_ocupacion_asistente/self.vector_estado_anterior.reloj)*100)
-        print("PORCENTAJE DE OCUPACION DE MECANICO:", (self.acum_tiempo_ocupacion_mecanico/self.vector_estado_anterior.reloj)*100)
-        return self.array_vector_estado_mostrar
+
+        # CALCULAMOS LAS ESTADISTICAS
+        prob_cliente_retirar_bicicleta_no_disp = round((self.cont_retirar_bici_no_reparada / self.cont_retirar_bici) ,4)
+        porc_ocup_mec = round((self.acum_tiempo_ocupacion_mecanico / self.vector_estado_anterior.reloj),4)
+        porc_ocup_asist = round((self.acum_tiempo_ocupacion_asistente/self.vector_estado_anterior.reloj),4)
+    
+        return self.array_vector_estado_mostrar, prob_cliente_retirar_bicicleta_no_disp, porc_ocup_mec, porc_ocup_asist
