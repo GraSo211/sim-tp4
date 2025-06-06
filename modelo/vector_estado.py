@@ -10,15 +10,19 @@ class Vector_Estado:
         self,
         evento: Evento,
         reloj: float,
+        rnd_tell:float,
         tiempo_entre_llegadas: float,
         hora_llegada: float,
+        rnd_m:float,
         motivo: Motivo_Cliente,
+        rnd_ta:float,
         tiempo_atencion: float,
         tiempo_fin_atencion: float,
         estado_cliente: Estado_Cliente,
         estado_asistente: Estado_Servidor,
         cola_asistente: int,
         cola_bicis_listas_para_retiro: int,
+        rnd_tr:float,
         tiempo_reparacion: float,
         tiempo_fin_reparacion: float,
         estado_mecanico: Estado_Servidor,
@@ -35,15 +39,19 @@ class Vector_Estado:
     ):
         self.evento: Evento = evento
         self.reloj: float = reloj
+        self.rnd_tell:float = rnd_tell
         self.tiempo_entre_llegadas: float = tiempo_entre_llegadas
         self.hora_llegada: float = hora_llegada
+        self.rnd_m: float = rnd_m
         self.motivo: Motivo_Cliente = motivo
+        self.rnd_ta: float = rnd_ta
         self.tiempo_atencion: float = tiempo_atencion
         self.tiempo_fin_atencion: float = tiempo_fin_atencion
         self.estado_cliente: Estado_Cliente = estado_cliente
         self.estado_asistente: Estado_Servidor = estado_asistente
         self.cola_asistente: int = cola_asistente
         self.cola_bicis_listas_para_retiro: int = cola_bicis_listas_para_retiro
+        self.rnd_tr:float = rnd_tr
         self.tiempo_reparacion: float = tiempo_reparacion
         self.tiempo_fin_reparacion: float = tiempo_fin_reparacion
         self.estado_mecanico: Estado_Servidor = estado_mecanico

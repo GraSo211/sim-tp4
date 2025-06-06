@@ -8,6 +8,7 @@ class Asistente:
     def __init__(self):
         self.estado:Estado = Estado.LIBRE.value
         self.cola_atencion: List[Cliente] = []
+        self.rnd_ta: float = 0.0
         self.tiempo_atencion:float = 0.0
         self.tiempo_fin_atencion:float = 0.0
 
@@ -27,10 +28,13 @@ class Asistente:
             # ENTRE 6 Y 10 MINUTOS
             cliente.estado = Estado_Cliente.SA.value
             if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
-                self.tiempo_atencion = round(random.uniform(6,10),4);
+                self.rnd_ta = round(random.random(),4)
+                rnd_uniforme = round((6+(10-6)*self.rnd_ta),4);
+                self.tiempo_atencion = rnd_uniforme;
                 self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
 
             elif(cliente.motivo_llegada == Motivo_Cliente.EBR.value or cliente.motivo_llegada == Motivo_Cliente.RBR.value ):
+                self.rnd_ta = 0
                 self.tiempo_atencion = round(3,4);
                 self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);
 
@@ -48,8 +52,11 @@ class Asistente:
             cliente = self.cola_atencion.pop(0)
             cliente.estado = Estado_Cliente.SA.value
             if(cliente.motivo_llegada == Motivo_Cliente.CA.value ):
-                self.tiempo_atencion = round(random.uniform(6,10),4);
+                self.rnd_ta = round(random.random(),4)
+                rnd_uniforme = round((6+(10-6)*self.rnd_ta),4);
+                self.tiempo_atencion = rnd_uniforme;
             elif(cliente.motivo_llegada == Motivo_Cliente.EBR.value or cliente.motivo_llegada == Motivo_Cliente.RBR.value ):
+                self.rnd_ta = 0
                 self.tiempo_atencion = round(3,4)
             
             self.tiempo_fin_atencion = round(reloj + self.tiempo_atencion,4);

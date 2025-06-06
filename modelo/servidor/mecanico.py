@@ -7,6 +7,7 @@ class Mecanico:
         self.estado: Estado = Estado.LIBRE.value
         self.tiempo_limpieza: float = 5.0
         self.cola_reparacion = 0
+        self.rnd_tr = 0.0
         self.tiempo_reparacion = 0.0
         self.tiempo_fin_limpieza: float = 0.0
         self.tiempo_fin_reparacion: float = 0.0
@@ -24,7 +25,9 @@ class Mecanico:
         # EL REPARAR BICICLETAS LE LLEVA ENTRE 18 Y 22 MINUTOS UNIFORMES
         if self.estado == Estado.LIBRE.value:
             self.estado = Estado.OCUPADO.value
-            self.tiempo_reparacion = round(random.uniform(18, 22), 4)
+            self.rnd_tr = round(random.random(),4)
+            rand_uniforme = round((18+(22-18)*self.rnd_tr), 4)
+            self.tiempo_reparacion = rand_uniforme
             self.tiempo_fin_reparacion = round(reloj + self.tiempo_reparacion, 4)
         # SI ESTA REPARANDO Y LLEGA UNA NUEVA BICICLETA, SE AUMENTA LA COLA DE REPARACION
         else:
@@ -40,7 +43,9 @@ class Mecanico:
         if self.cola_reparacion > 0:
             self.estado = Estado.OCUPADO.value
             self.cola_reparacion -= 1
-            self.tiempo_reparacion = round(random.uniform(18, 22), 4)
+            self.rnd_tr = round(random.random(),4)
+            rand_uniforme = round((18+(22-18)*self.rnd_tr), 4)
+            self.tiempo_reparacion = rand_uniforme
             self.tiempo_fin_reparacion = round(reloj + self.tiempo_reparacion, 4)
 
         # SI NO HAY BICIS EN LA COLA DE REPARACION, VUELVE A ESTAR LIBRE
