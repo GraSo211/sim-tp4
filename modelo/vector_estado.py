@@ -28,7 +28,8 @@ class Vector_Estado:
         cont_retirar_bici_no_reparada: int,
         acum_tiempo_ocupacion_asistente: float,
         acum_tiempo_ocupacion_mecanico: float,
-        cliente : Cliente
+        cliente : Cliente,
+        clientes_en_cola: List[Cliente]
         
 
     ):
@@ -53,6 +54,7 @@ class Vector_Estado:
         self.acum_tiempo_ocupacion_asistente = acum_tiempo_ocupacion_asistente
         self.acum_tiempo_ocupacion_mecanico = acum_tiempo_ocupacion_mecanico
         self.cliente = cliente
+        self.clientes_en_cola = clientes_en_cola
 
     def __str__(self):
         clientes_str = "\n".join([f"  - {cliente}" for cliente in self.clientes])
@@ -79,4 +81,5 @@ class Vector_Estado:
             f"Acumulado ocupación asistente: {self.acum_tiempo_ocupacion_asistente}\n"
             f"Acumulado ocupación mecánico: {self.acum_tiempo_ocupacion_mecanico}\n"
             f"Cliente:\n{clientes_str}"
+            f"Clientes en cola:\n{self.clientes_en_cola}"
         )
