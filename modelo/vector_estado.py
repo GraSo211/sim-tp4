@@ -29,7 +29,7 @@ class Vector_Estado:
         acum_tiempo_ocupacion_asistente: float,
         acum_tiempo_ocupacion_mecanico: float,
         cliente : Cliente,
-
+        cola_eventos
         
 
     ):
@@ -54,9 +54,10 @@ class Vector_Estado:
         self.acum_tiempo_ocupacion_asistente = acum_tiempo_ocupacion_asistente
         self.acum_tiempo_ocupacion_mecanico = acum_tiempo_ocupacion_mecanico
         self.cliente = cliente
+        self.cola_eventos = cola_eventos
 
     def __str__(self):
-        clientes_str = "\n".join([f"  - {cliente}" for cliente in self.clientes])
+    
 
         return (
             f"Evento: {self.evento}\n"
@@ -79,6 +80,6 @@ class Vector_Estado:
             f"Contador retirar bicicleta NO reparada: {self.cont_retirar_bici_no_reparada}\n"
             f"Acumulado ocupación asistente: {self.acum_tiempo_ocupacion_asistente}\n"
             f"Acumulado ocupación mecánico: {self.acum_tiempo_ocupacion_mecanico}\n"
-            f"Cliente:\n{clientes_str}"
-            f"Clientes en cola:\n{self.clientes_en_cola}"
+            f"Cliente:\n{self.cliente}"
+            f"COLA_EVENTOS: {self.cola_eventos}"
         )

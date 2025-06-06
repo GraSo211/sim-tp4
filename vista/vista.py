@@ -197,7 +197,7 @@ class Vista(tk.Tk):
             "acum_tiempo_ocupacion_mecanico",
         ]
 
-        columnas = atributos + ["id_cliente", "estado_cliente"]
+        columnas = atributos + ["id_cliente", "estado_cliente", "cola_eventos"]
 
         # Frame contenedor de tabla y scrollbars
         frame_tabla = tk.Frame(frame_superior)
@@ -226,21 +226,26 @@ class Vista(tk.Tk):
         # Configurar columnas
         for col in columnas:
             self.tree_vector_estado.heading(col, text=col)
-            self.tree_vector_estado.column(col, anchor="center", width=150)
+            self.tree_vector_estado.column(col, anchor="center", width=300)
 
         self.tree_vector_estado.pack(fill=tk.BOTH, expand=True)
 
-        # Insertar datos
         for vector in lista_vectores_estado:
             valores = [getattr(vector, attr) for attr in atributos]
+
             if vector.cliente:
                 valores.append(vector.cliente.id)
                 valores.append(vector.cliente.estado)
             else:
                 valores.extend(["", ""])
+
+
+            eventos = [str(tupla[1]) for tupla in vector.cola_eventos]
+            valores.append(", ".join(eventos))
+
             self.tree_vector_estado.insert("", tk.END, values=valores)
 
-        # === Mostrar resultados debajo ===
+        # RESULTADOS
         label_resultados = tk.Label(
             frame_inferior,
             text=(
@@ -259,7 +264,7 @@ class Vista(tk.Tk):
         )
         label_resultados.pack(pady=(10, 0), fill=tk.X, expand=True)
 
-        # === Botón de reinicio debajo ===
+        # BOTON REINICIAR
         btn_reiniciar = tk.Button(
             frame_inferior,
             text="Reiniciar simulación",

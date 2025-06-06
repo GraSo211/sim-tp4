@@ -7,7 +7,7 @@ from modelo.evento import Evento
 from modelo.cliente.motivo_cliente import Motivo_Cliente
 from modelo.servidor.estado_asistente import Estado as Estado_Asistente
 from modelo.servidor.estado_mecanico import Estado as Estado_Mecanico
-
+import copy
 CANT_MAXIMA_ITERACIONES = 100000
 BICIS_REPARADAS = 3
 
@@ -91,7 +91,7 @@ class Simulacion:
             acum_tiempo_ocupacion_asistente = 0.0,
             acum_tiempo_ocupacion_mecanico = 0.0,
             cliente=self.cliente,
-
+            cola_eventos = copy.deepcopy(cola_eventos)
         )
 
         self.vector_estado_anterior = vector_estado
@@ -202,7 +202,7 @@ class Simulacion:
                 acum_tiempo_ocupacion_asistente = round(self.acum_tiempo_ocupacion_asistente,4),
                 acum_tiempo_ocupacion_mecanico = round(self.acum_tiempo_ocupacion_mecanico,4),
                 cliente = self.cliente,
-
+                cola_eventos = copy.deepcopy(cola_eventos)
             )
             
             # PARA ESTADISTICAS DE OCUPACION ANTES DE ITERAR ACUMULAMOS SI Y SOLO SI ESTAN OCUPADOS}
