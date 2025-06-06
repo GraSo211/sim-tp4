@@ -91,7 +91,7 @@ class Simulacion:
             acum_tiempo_ocupacion_asistente = 0.0,
             acum_tiempo_ocupacion_mecanico = 0.0,
             cliente=self.cliente,
-            clientes_en_cola = self.asistente.cola_atencion
+
         )
 
         self.vector_estado_anterior = vector_estado
@@ -202,7 +202,7 @@ class Simulacion:
                 acum_tiempo_ocupacion_asistente = round(self.acum_tiempo_ocupacion_asistente,4),
                 acum_tiempo_ocupacion_mecanico = round(self.acum_tiempo_ocupacion_mecanico,4),
                 cliente = self.cliente,
-                clientes_en_cola = self.asistente.cola_atencion
+
             )
             
             # PARA ESTADISTICAS DE OCUPACION ANTES DE ITERAR ACUMULAMOS SI Y SOLO SI ESTAN OCUPADOS}
