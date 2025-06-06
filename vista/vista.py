@@ -162,29 +162,6 @@ class Vista(tk.Tk):
         for widget in self.frame_vector_estado.winfo_children():
             widget.destroy()
 
-        # Scrollbars
-        scroll_y = tk.Scrollbar(self.frame_vector_estado, orient="vertical")
-        scroll_y.pack(side="right", fill="y")
-
-        scroll_x = tk.Scrollbar(self.frame_vector_estado, orient="horizontal")
-        scroll_x.pack(side="bottom", fill="x")
-
-        # Treeview
-        self.tree_vector_estado = ttk.Treeview(
-            self.frame_vector_estado,
-            yscrollcommand=scroll_y.set,
-            xscrollcommand=scroll_x.set
-        )
-        self.tree_vector_estado.pack(fill="both", expand=True)
-
-        # Vincular scrollbars al Treeview
-        scroll_y.config(command=self.tree_vector_estado.yview)
-        scroll_x.config(command=self.tree_vector_estado.xview)
-
-        if not lista_vectores_estado:
-            self.tree_vector_estado["columns"] = []
-            return
-
         # Atributos del vector de estado
         atributos = [
             "evento",
@@ -209,13 +186,39 @@ class Vista(tk.Tk):
         ]
 
         columnas = atributos + ["id_cliente", "estado_cliente"]
-        self.tree_vector_estado["columns"] = columnas
-        self.tree_vector_estado["show"] = "headings"
 
+        # Frame contenedor del Treeview y scrollbars
+        frame_tabla = tk.Frame(self.frame_vector_estado)
+        frame_tabla.pack(fill=tk.BOTH, expand=True)
+
+        # Scrollbars
+        scroll_y = tk.Scrollbar(frame_tabla, orient=tk.VERTICAL)
+        scroll_x = tk.Scrollbar(frame_tabla, orient=tk.HORIZONTAL)
+
+        # Treeview con scroll
+        self.tree_vector_estado = ttk.Treeview(
+            frame_tabla,
+            columns=columnas,
+            show="headings",
+            yscrollcommand=scroll_y.set,
+            xscrollcommand=scroll_x.set
+        )
+
+        # Configurar scrollbars
+        scroll_y.config(command=self.tree_vector_estado.yview)
+        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+
+        scroll_x.config(command=self.tree_vector_estado.xview)
+        scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
+
+        # Configurar columnas
         for col in columnas:
             self.tree_vector_estado.heading(col, text=col)
             self.tree_vector_estado.column(col, anchor="center", width=150)
 
+        self.tree_vector_estado.pack(fill=tk.BOTH, expand=True)
+
+        # Insertar los valores
         for vector in lista_vectores_estado:
             valores = [getattr(vector, attr) for attr in atributos]
 
@@ -226,3 +229,32 @@ class Vista(tk.Tk):
                 valores.extend(["", ""])
 
             self.tree_vector_estado.insert("", tk.END, values=valores)
+
+        # Botón para reiniciar la simulación
+        btn_reiniciar = tk.Button(
+            self.frame_vector_estado,
+            text="Reiniciar simulación",
+            font=FONT_LABEL,
+            bg="#f44336",
+            fg=BTN_TEXT_COLOR,
+            command=self._reiniciar_simulacion,
+            padx=20,
+            pady=10,
+        )
+        btn_reiniciar.pack(pady=20)
+
+
+
+    def _reiniciar_simulacion(self):
+        # Mostrar campos de entrada y botón de iniciar
+        self.frame_sim.pack(pady=10)
+        self.frame_btn.pack(pady=20)
+
+        # Ocultar tabla
+        self.frame_vector_estado.pack_forget()
+
+        # Limpiar campos
+        self.tiempo_duracion.delete(0, tk.END)
+        self.hora_observar.delete(0, tk.END)
+        self.cant_iteraciones.delete(0, tk.END)
+        self.tiempo_error.config(text="")
