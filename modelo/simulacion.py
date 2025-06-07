@@ -152,7 +152,7 @@ class Simulacion:
         ):
 
             # COMENZAREMOS BUSCANDO CUAL ES EL PROXIMO EVENTO, PARA ELLO BUSCAMOS EL QUE TENGA EL MENOR TIEMPO EN LA COLA DE EVENTO
-            print("\n\n\n\nCola de eventos:", cola_eventos)
+          
             evento_actual = min(cola_eventos)
             cola_eventos.remove(evento_actual)
             reloj = evento_actual[0]
@@ -309,7 +309,6 @@ class Simulacion:
 
             if reloj >= self.HORA_OBSERVAR and self.CANT_ITERACIONES > 0:
                 self.array_vector_estado_mostrar.append(vector_estado)
-                print(self.CANT_ITERACIONES)
                 self.CANT_ITERACIONES -= 1
 
             # FINALMENTE SUMAMOS UNA ITERACION Y ACTUALIZAMOS EL VECTOR ESTADO

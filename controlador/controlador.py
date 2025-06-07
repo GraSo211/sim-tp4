@@ -121,23 +121,6 @@ class Controlador:
 
         # Ya todo validado y limpio, crear simulación
 
-        print(
-            f"""
-            TIEMPO_SIMULACION = {tiempo_duracion}
-            HORA_OBSERVAR = {hora_observar}
-            CANT_ITERACIONES = {cant_iteraciones}
-            evento_llc_val_a = {evento_llc_val_a}
-            evento_llc_val_b = {evento_llc_val_b}
-            motivo_ca_prob = {motivo_ca_prob}
-            motivo_ebr_prob = {motivo_ebr_prob}
-            motivo_rbr_prob = {motivo_rbr_prob}
-            evento_motivo_ca_val_a = {evento_motivo_ca_val_a}
-            evento_motivo_ca_val_b = {evento_motivo_ca_val_b}
-            evento_rep_val_a = {evento_rep_val_a}
-            evento_rep_val_b = {evento_rep_val_b}
-            evento_limpieza_val = {evento_limpieza_val}
-            """
-        )
 
         self.modelo = Simulacion(
             TIEMPO_SIMULACION=tiempo_duracion,
