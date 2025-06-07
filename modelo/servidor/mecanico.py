@@ -3,14 +3,16 @@ import random
 
 
 class Mecanico:
-    def __init__(self,):
+    def __init__(self, evento_rep_val_a, evento_rep_val_b, evento_limpieza_val):
         self.estado: Estado = Estado.LIBRE.value
-        self.tiempo_limpieza: float = 5.0
+        self.tiempo_limpieza: float = evento_limpieza_val
         self.cola_reparacion = 0
         self.rnd_tr = 0.0
         self.tiempo_reparacion = 0.0
         self.tiempo_fin_limpieza: float = 0.0
         self.tiempo_fin_reparacion: float = 0.0
+        self.evento_rep_val_a = evento_rep_val_a
+        self.evento_rep_val_b = evento_rep_val_b
 
     # EL MECANICO TIENE 3 OPCIONES:
     # ESTAR LIBRE
@@ -26,7 +28,7 @@ class Mecanico:
         if self.estado == Estado.LIBRE.value:
             self.estado = Estado.OCUPADO.value
             self.rnd_tr = round(random.random(),4)
-            rand_uniforme = round((18+(22-18)*self.rnd_tr), 4)
+            rand_uniforme = round((self.evento_rep_val_a+(self.evento_rep_val_b-self.evento_rep_val_a)*self.rnd_tr), 4)
             self.tiempo_reparacion = rand_uniforme
             self.tiempo_fin_reparacion = round(reloj + self.tiempo_reparacion, 4)
         # SI ESTA REPARANDO Y LLEGA UNA NUEVA BICICLETA, SE AUMENTA LA COLA DE REPARACION
@@ -44,7 +46,7 @@ class Mecanico:
             self.estado = Estado.OCUPADO.value
             self.cola_reparacion -= 1
             self.rnd_tr = round(random.random(),4)
-            rand_uniforme = round((18+(22-18)*self.rnd_tr), 4)
+            rand_uniforme = round((self.evento_rep_val_a+(self.evento_rep_val_b-self.evento_rep_val_a)*self.rnd_tr), 4)
             self.tiempo_reparacion = rand_uniforme
             self.tiempo_fin_reparacion = round(reloj + self.tiempo_reparacion, 4)
 

@@ -4,8 +4,8 @@ import tkinter.font as tkFont
 
 
 BG_COLOR = "#f5f5f5"
-FONT_TITLE = ("Montserrat", 32, "bold")
-FONT_LABEL = ("Montserrat", 18, "bold")
+FONT_TITLE = ("Montserrat", 20, "bold")
+FONT_LABEL = ("Montserrat", 14, "bold")
 FONT_MINI = ("Montserrat", 12, "bold")
 FONT_ENTRY = ("Montserrat", 16)
 FONT_NOTE = ("Montserrat", 12, "bold")
@@ -17,9 +17,7 @@ BTN_TEXT_COLOR = "white"
 
 
 class Vista(tk.Tk):
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         super().__init__()
         self.title("SIMULACIÓN TP4 - GRUPO 6")
         self.geometry("1280x720")
@@ -36,6 +34,7 @@ class Vista(tk.Tk):
         # Ocultar los inputs y el botón
         self.frame_sim.pack_forget()
         self.frame_btn.pack_forget()
+        self.frame_parametros.pack_forget()
 
         # Mostrar tabla en su lugar
         self.frame_vector_estado.pack(fill="both", expand=True, pady=10, padx=10)
@@ -69,18 +68,6 @@ class Vista(tk.Tk):
         )
         self.tiempo_duracion.grid(row=0, column=1, padx=10, pady=5)
 
-        tk.Label(
-            self.frame_sim,
-            text=(
-                "El tiempo debe estar en minutos.\n"
-                "La simulación durará hasta cumplir con el tiempo indicado\n"
-                "o hasta las 100.000 iteraciones, lo que ocurra primero."
-            ),
-            font=FONT_NOTE,
-            bg=BG_COLOR,
-            fg=FG_NOTE,
-            justify="left",
-        ).grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
     def _iteraciones_hora(self):
         tk.Label(
@@ -113,6 +100,46 @@ class Vista(tk.Tk):
         )
         self.cant_iteraciones.grid(row=3, column=1, padx=10, pady=10)
 
+    def _parametros_adicionales(self):
+        fila_base = 0
+        def lbl(texto, fila, col):
+            l = tk.Label(self.frame_parametros, text=texto, font=FONT_LABEL, bg=BG_COLOR, fg=FG_LABEL)
+            l.grid(row=fila, column=col, sticky="w", padx=(2, 2), pady=2)
+            return l
+
+        def entry(attr, fila, col):
+            e = tk.Entry(self.frame_parametros, font=FONT_ENTRY)
+            e.grid(row=fila, column=col, sticky="ew", padx=(2, 5), pady=2)
+            setattr(self, attr, e)
+
+        lbl("Llegada Cliente Valor A:", fila_base, 0)
+        entry("evento_llc_val_a", fila_base, 1)
+        lbl("Llegada Cliente Valor B:", fila_base, 2)
+        entry("evento_llc_val_b", fila_base, 3)
+
+        lbl("Tiempo Comprar Acces Valor A:", fila_base + 1, 0)
+        entry("evento_motivo_ca_val_a", fila_base + 1, 1)
+        lbl("Tiempo Comprar Acces Valor B:", fila_base + 1, 2)
+        entry("evento_motivo_ca_val_b", fila_base + 1, 3)
+
+        lbl("Evento Reparacion Valor A:", fila_base + 2, 0)
+        entry("evento_rep_val_a", fila_base + 2, 1)
+        lbl("Evento Reparacion Valor B:", fila_base + 2, 2)
+        entry("evento_rep_val_b", fila_base + 2, 3)
+
+
+        lbl("Tiempo Evento Limpieza:", fila_base + 3, 0)
+        entry("evento_limpieza_val", fila_base + 3, 1)
+
+        lbl("Prob Comprar Accesorios:", fila_base + 3, 2)
+        entry("motivo_ca_prob", fila_base + 3, 3)
+
+        lbl("Prob Entregar Bicicleta Reparacion:", fila_base + 4, 0)
+        entry("motivo_ebr_prob", fila_base + 4, 1)
+        lbl("Prob Retirar Bicicleta Reparacion:", fila_base + 4, 2)
+        entry("motivo_rbr_prob", fila_base + 4, 3)
+
+
     def _iniciar_simulacion(self):
         self.frame_btn = tk.Frame(self, bg=BG_COLOR)
         self.frame_btn.pack(pady=20)
@@ -133,12 +160,12 @@ class Vista(tk.Tk):
         self._titulo_ventana()
 
         self.frame_sim = tk.Frame(self, bg=BG_COLOR)
-        self.frame_sim.pack(pady=10)
+        self.frame_sim.pack(pady=10, fill="x")
+
 
         self._tiempo_simulacion()
         self._iteraciones_hora()
 
-        # todo: Mensaje de error RECORDAR ACTUALIZAR EL GRID POR CADA ELEMENTO NUEVO AGREGADO
         self.tiempo_error = tk.Label(
             self.frame_sim,
             bg=BG_COLOR,
@@ -148,11 +175,19 @@ class Vista(tk.Tk):
         )
         self.tiempo_error.grid(row=4, column=0, columnspan=2, pady=5)
 
+
+        self.frame_parametros = tk.Frame(self, bg=BG_COLOR)
+        self.frame_parametros.pack(pady=(20, 10), fill="x")
+
+        for i in range(4):
+            self.frame_parametros.grid_columnconfigure(i, weight=1)
+
+        self._parametros_adicionales()
+
         self._iniciar_simulacion()
 
         self.frame_vector_estado = tk.Frame(self, bg=BG_COLOR)
 
-        # Creamos el Treeview vacío inicialmente
         self.tree_vector_estado = ttk.Treeview(self.frame_vector_estado)
         self.tree_vector_estado.pack(fill="both", expand=True)
 
@@ -163,18 +198,16 @@ class Vista(tk.Tk):
         porc_ocup_mec,
         porc_ocup_asist,
     ):
-        # Limpiar frame por si ya hay un Treeview anterior
+    
         for widget in self.frame_vector_estado.winfo_children():
             widget.destroy()
 
-        # === Crear frames para organizar verticalmente ===
         frame_superior = tk.Frame(self.frame_vector_estado)
         frame_superior.pack(fill=tk.BOTH, expand=True)
 
         frame_inferior = tk.Frame(self.frame_vector_estado)
         frame_inferior.pack(fill=tk.X)
 
-        # Atributos del vector de estado
         atributos = [
             "evento",
             "reloj",
@@ -220,14 +253,13 @@ class Vista(tk.Tk):
             xscrollcommand=scroll_x.set,
         )
 
-        # Configurar scrollbars
+
         scroll_y.config(command=self.tree_vector_estado.yview)
         scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
 
         scroll_x.config(command=self.tree_vector_estado.xview)
         scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
 
-        # Configurar columnas
         for col in columnas:
             self.tree_vector_estado.heading(col, text=col)
             self.tree_vector_estado.column(col, anchor="center", width=300)
@@ -242,7 +274,6 @@ class Vista(tk.Tk):
                 valores.append(vector.cliente.estado)
             else:
                 valores.extend(["", ""])
-
 
             eventos = [str(tupla[1]) for tupla in vector.cola_eventos]
             valores.append(", ".join(eventos))
@@ -283,8 +314,11 @@ class Vista(tk.Tk):
 
     def _reiniciar_simulacion(self):
         # MOSTRAMOS DE VUELTA LOS INPUTS Y EL BOTON INICIAR
-        self.frame_sim.pack(pady=10)
+        self.frame_sim.pack(pady=10, fill="x")
+        self.frame_parametros.pack(pady=(20, 10), fill="x")
         self.frame_btn.pack(pady=20)
+        
+
 
         # OCULTAMOS LA TABLA
         self.frame_vector_estado.pack_forget()
@@ -294,3 +328,8 @@ class Vista(tk.Tk):
         self.hora_observar.delete(0, tk.END)
         self.cant_iteraciones.delete(0, tk.END)
         self.tiempo_error.config(text="")
+
+        # LIMPIAMOS LOS CAMPOS DE self.frame_parametros
+        for widget in self.frame_parametros.winfo_children():
+            if isinstance(widget, tk.Entry):
+                widget.delete(0, tk.END)
