@@ -300,7 +300,10 @@ class Simulacion:
                 )
 
             if self.asistente.estado == Estado_Asistente.OCUPADO.value:
-                self.acum_tiempo_ocupacion_asistente += self.asistente.tiempo_atencion
+                self.acum_tiempo_ocupacion_asistente += round(
+                    tiempo_actual - tiempo_anterior, 4
+                )
+                
 
             # SI EL RELOJ ESTA DENTRO DEL RANGO INDICADO POR EL USUARIO Y NO NOS EXCEDIMOS DE LA CANTIDAD DE ITERACIONES QUE DEFINIO AGREGAMOS EL NUEVO VECTOR ESTADO A LA LISTA PARA MOSTRAR
 
