@@ -33,9 +33,8 @@ class Vector_Estado:
         acum_tiempo_ocupacion_asistente: float,
         acum_tiempo_ocupacion_mecanico: float,
         cliente : Cliente,
-        cola_eventos
-        
-
+        cola_eventos,
+        clientes_en_cola: List[Cliente]
     ):
         self.evento: Evento = evento
         self.reloj: float = reloj
@@ -61,9 +60,10 @@ class Vector_Estado:
         self.cont_retirar_bici_no_reparada = cont_retirar_bici_no_reparada
         self.acum_tiempo_ocupacion_asistente = acum_tiempo_ocupacion_asistente
         self.acum_tiempo_ocupacion_mecanico = acum_tiempo_ocupacion_mecanico
-        self.cliente = cliente
+        self.cliente: Cliente = cliente
         self.cola_eventos = cola_eventos
-
+        self.clientes_en_cola: List[Cliente] = clientes_en_cola
+    
     def __str__(self):
     
 

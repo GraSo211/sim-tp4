@@ -136,6 +136,7 @@ class Simulacion:
             acum_tiempo_ocupacion_mecanico=0.0,
             cliente=self.cliente,
             cola_eventos=copy.deepcopy(cola_eventos),
+            clientes_en_cola= []
         )
 
         self.vector_estado_anterior = vector_estado
@@ -257,6 +258,7 @@ class Simulacion:
                         )
                     )
 
+            
             # CON LAS 4 OPCIONES RESUELTAS, GENERAMOS EL NUEVO VECTOR DE ESTADO
             vector_estado = Vector_Estado(
                 evento=evento_actual[1],
@@ -289,6 +291,7 @@ class Simulacion:
                 ),
                 cliente=self.cliente,
                 cola_eventos=copy.deepcopy(cola_eventos),
+                clientes_en_cola=copy.deepcopy(self.asistente.cola_atencion)
             )
 
             # PARA ESTADISTICAS DE OCUPACION ANTES DE ITERAR ACUMULAMOS SI Y SOLO SI ESTAN OCUPADOS}

@@ -234,7 +234,7 @@ class Vista(tk.Tk):
             "acum_tiempo_ocupacion_mecanico",
         ]
 
-        columnas = atributos + ["id_cliente", "estado_cliente", "cola_eventos"]
+        columnas = atributos + ["id_cliente", "estado_cliente", "cola_eventos","clientes_en_cola"]
 
         # Frame contenedor de tabla y scrollbars
         frame_tabla = tk.Frame(frame_superior)
@@ -277,6 +277,13 @@ class Vista(tk.Tk):
 
             eventos = [str(tupla[1]) for tupla in vector.cola_eventos]
             valores.append(", ".join(eventos))
+
+
+            if hasattr(vector, 'clientes_en_cola') and vector.clientes_en_cola:
+                cola_clientes_str = ", ".join(f"{c.id}({c.estado})" for c in vector.clientes_en_cola)
+            else:
+                cola_clientes_str = ""
+            valores.append(cola_clientes_str)
 
             self.tree_vector_estado.insert("", tk.END, values=valores)
 
