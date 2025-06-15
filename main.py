@@ -8,10 +8,6 @@ class Main:
         self.controlador = Controlador(self.vista)
         
 
-
-
-
-
     def run(self):
         self.vista.mainloop();
 if __name__ == "__main__":
